@@ -1,9 +1,24 @@
-import { type AppType } from "next/dist/shared/lib/utils";
+import type { AppProps } from "next/app";
+import type { NextPage } from "next";
+import type { ReactElement } from "react";
 import { ClerkProvider } from "@clerk/nextjs";
 
 import "~/styles/globals.css";
 
-const MyApp: AppType = ({ Component, pageProps }) => {
+export type NextPageWithLayout<PageProps = unknown> = NextPage<PageProps> & {
+  getLayout?: (page: ReactElement<PageProps>) => ReactElement;
+};
+
+type AppPropsWithLayout<T> = AppProps<T> & {
+  Component: NextPageWithLayout<T>;
+};
+
+const MyApp = <T extends object>({
+  Component,
+  pageProps: { ...pageProps },
+}: AppPropsWithLayout<T>) => {
+  const getLayout = Component.getLayout ?? ((page) => page);
+
   return (
     <ClerkProvider
       appearance={{
@@ -26,7 +41,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
         },
       }}
     >
-      <Component {...pageProps} />
+      {getLayout(<Component {...pageProps} />)}
     </ClerkProvider>
   );
 };
