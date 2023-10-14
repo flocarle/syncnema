@@ -1,10 +1,17 @@
-import { UserButton, SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
+import {
+  UserButton,
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  useSession,
+} from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 import NavbarItem from "../atoms/NavbarItem";
 import { type Item } from "~/src/utils/constants/NavbarItems";
 import { useRouter } from "next/router";
 import { Button } from "../atoms/Button";
+import { Skeleton } from "../ui/skeleton";
 
 type NavbarProps = {
   items: Item[];
@@ -12,6 +19,7 @@ type NavbarProps = {
 
 const Navbar = ({ items }: NavbarProps) => {
   const router = useRouter();
+  const { isLoaded } = useSession();
 
   return (
     <nav className="fixed top-0 flex h-fit w-full flex-row items-center justify-between bg-secondary p-4">
@@ -37,16 +45,20 @@ const Navbar = ({ items }: NavbarProps) => {
         ))}
       </div>
 
-      <div>
-        <SignedIn>
-          <UserButton afterSignOutUrl="/" />
-        </SignedIn>
-        <SignedOut>
-          <SignInButton>
-            <Button>Iniciar Sesión</Button>
-          </SignInButton>
-        </SignedOut>
-      </div>
+      {isLoaded ? (
+        <div>
+          <SignedIn>
+            <UserButton afterSignOutUrl="/" />
+          </SignedIn>
+          <SignedOut>
+            <SignInButton>
+              <Button>Iniciar Sesión</Button>
+            </SignInButton>
+          </SignedOut>
+        </div>
+      ) : (
+        <Skeleton className="h-9 w-10" />
+      )}
     </nav>
   );
 };
