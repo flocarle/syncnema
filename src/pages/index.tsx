@@ -1,12 +1,12 @@
-import Head from "next/head";
-import Link from "next/link";
+import Layout from "~/src/components/templates/Layout";
+import { type NextPageWithLayout } from "./_app";
 
-import { UserButton } from "@clerk/nextjs";
+const Home: NextPageWithLayout = () => (
+  <div>
+    <h1 className="text-xl">SyncNema Home</h1>
+  </div>
+);
 
-export default function Home() {
-  return (
-    <div>
-      <UserButton afterSignOutUrl="/" />
-    </div>
-  );
-}
+Home.getLayout = (page) => <Layout>{page}</Layout>;
+
+export default Home;
