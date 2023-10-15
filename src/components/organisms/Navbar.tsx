@@ -8,7 +8,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import NavbarItem from "../atoms/NavbarItem";
-import { type Item } from "~/src/utils/constants/NavbarItems";
+import { type Item } from "~/utils/constants/NavbarItems";
 import { useRouter } from "next/router";
 import { Button } from "../atoms/Button";
 import { Skeleton } from "../atoms/Skeleton";
