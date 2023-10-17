@@ -1,7 +1,7 @@
 import React, { type ReactElement } from "react";
 import Head from "../atoms/Head";
 import Navbar from "../organisms/Navbar";
-import NavbarItems from "~/src/utils/constants/NavbarItems";
+import NavbarItems from "~/utils/constants/NavbarItems";
 
 type LayoutProps = {
   children: ReactElement;

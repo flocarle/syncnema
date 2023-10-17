@@ -1,4 +1,4 @@
-import Layout from "~/src/components/templates/Layout";
+import Layout from "~/components/templates/Layout";
 import { type NextPageWithLayout } from "./_app";
 
 const Favorites: NextPageWithLayout = () => (
