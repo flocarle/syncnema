@@ -12,13 +12,17 @@ type DropdownProps = {
 const Dropdown = ({ options, value, multiple, onChange }: DropdownProps) => (
   <div className="relative h-full w-full">
     <Listbox value={value} onChange={onChange} multiple={multiple}>
-      <Listbox.Button className="relative flex h-full w-full cursor-pointer items-center rounded-md bg-gray-50 px-2 text-left shadow-sm">
+      <Listbox.Button className="relative flex h-full w-full cursor-pointer items-center rounded-md bg-gray-50 ps-2 text-left shadow-sm">
         <p className="w-10/12 truncate text-sm">
           {typeof value === "string" ? value : value.join(", ")}
         </p>
 
-        <ChevronDownIcon className="h-6 w-6 opacity-50" aria-hidden="true" />
+        <ChevronDownIcon
+          className="absolute right-0 h-6 w-6 opacity-50"
+          aria-hidden="true"
+        />
       </Listbox.Button>
+
       <Transition
         as={Fragment}
         leave="transition ease-in duration-100"
