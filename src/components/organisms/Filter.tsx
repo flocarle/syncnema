@@ -52,6 +52,7 @@ const Filter = ({
 
       <div className="h-9 w-1/5">
         <Dropdown
+          placeholder="Género"
           options={genres}
           multiple
           onChange={(value) => setSelectedGenres(value as string[])}
@@ -61,6 +62,7 @@ const Filter = ({
 
       <div className="h-9 w-1/5">
         <Dropdown
+          placeholder="Plataforma"
           options={platforms}
           multiple
           onChange={(value) => setSelectedPlatforms(value as string[])}
