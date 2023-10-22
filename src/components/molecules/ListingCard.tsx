@@ -13,7 +13,7 @@ const MAP_TYPE_TO_URL = {
   tv: "/tv-shows",
 } as const;
 
-const ImageCard = ({ id, imageUrl, name, type }: ImageCardProps) => {
+const ListingCard = ({ id, imageUrl, name, type }: ImageCardProps) => {
   const redirectUrl = `${MAP_TYPE_TO_URL[type]}/${id}`;
 
   return (
@@ -34,4 +34,4 @@ const ImageCard = ({ id, imageUrl, name, type }: ImageCardProps) => {
   );
 };
 
-export default ImageCard;
+export default ListingCard;
