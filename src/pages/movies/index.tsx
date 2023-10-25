@@ -9,6 +9,7 @@ const Movies: NextPageWithLayout = () => {
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
   const [search, setSearch] = useState("");
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const debouncedSearch = useDebounce(search, 500);
 
   return (
