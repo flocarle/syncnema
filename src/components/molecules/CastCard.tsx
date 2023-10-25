@@ -10,7 +10,7 @@ const CastCard = ({ imageUrl, name }: ImageCardProps) => (
     style={{
       backgroundImage: `url(${imageUrl})`,
     }}
-    className={"group relative h-52 w-40 bg-cover"}
+    className={"group relative h-48 w-40 bg-cover"}
   >
     <div className="group-hover:border-fade h-full w-full rounded-xl bg-black bg-opacity-0 transition-all duration-200 group-hover:bg-opacity-10" />
 

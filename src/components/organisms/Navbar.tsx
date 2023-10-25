@@ -14,7 +14,7 @@ const Navbar = ({ items }: NavbarProps) => {
   const router = useRouter();
 
   return (
-    <nav className="fixed top-0 flex h-fit w-full flex-row items-center justify-between bg-secondary p-4">
+    <nav className="fixed top-0 z-40 flex h-fit w-full flex-row items-center justify-between bg-secondary p-4">
       <Link href="/">
         <Image
           src="/images/logo.svg"
