@@ -3,7 +3,7 @@ import { type NextPageWithLayout } from "./_app";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import ListingCard from "~/components/molecules/ListingCard";
 
-type Listing = {
+export type Listing = {
   id: string;
   imageUrl: string;
   name: string;
