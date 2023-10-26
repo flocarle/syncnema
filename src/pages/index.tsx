@@ -1,51 +1,43 @@
 import Layout from "~/components/templates/Layout";
 import { type NextPageWithLayout } from "./_app";
 import ListingCard from "~/components/molecules/ListingCard";
-import CastCard from "~/components/molecules/CastCard";
-import Rating from "~/components/atoms/Rating";
-import { useState } from "react";
 
-const Home: NextPageWithLayout = () => {
-  const [userRating, setUserRating] = useState(0);
+import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
+import { type Listing, generateListings } from "~/utils/listingGenerator";
 
-  return (
-    <div className="flex flex-col gap-4">
-      <div className="flex gap-4">
-        <ListingCard
-          name="Oppenheimer"
-          imageUrl="https://m.media-amazon.com/images/M/MV5BMDBmYTZjNjUtN2M1MS00MTQ2LTk2ODgtNzc2M2QyZGE5NTVjXkEyXkFqcGdeQXVyNzAwMjU2MTY@._V1_.jpg"
-          id="1"
-          type="movie"
-        />
-
-        <ListingCard
-          name="New Girl"
-          imageUrl="https://www.themoviedb.org/t/p/original/8oCqMlKKomCArVtyOjRzMN6g40Z.jpg"
-          id="1"
-          type="tv"
-        />
-      </div>
-
-      <div className="flex gap-4">
-        <CastCard
-          name="Margot Robbie"
-          imageUrl="https://upload.wikimedia.org/wikipedia/commons/3/33/SYDNEY%2C_AUSTRALIA_-_JANUARY_23_Margot_Robbie_arrives_at_the_Australian_Premiere_of_%27I%2C_Tonya%27_on_January_23%2C_2018_in_Sydney%2C_Australia_%2828074883999%29_%28cropped%29.jpg"
-        />
-
-        <CastCard
-          name="Ryan Gosling"
-          imageUrl="https://media.glamourmagazine.co.uk/photos/64b6ae8fcd1ad7c51ecf045c/1:1/w_1280,h_1280,c_limit/RYAN%20GOSLING%20EVA%20MENDES%20180723%20defaultGettyImages-1527942629.jpg"
-        />
-      </div>
-
-      <Rating
-        peopleRating={88}
-        userRating={userRating}
-        setUserRating={setUserRating}
-      />
+const ScrollableListing = ({ listings }: { listings: Listing[] }) => (
+  <ScrollArea>
+    <div className="flex gap-4">
+      {listings.map((listing) => (
+        <ListingCard key={listing.id} type={listing.listingType} {...listing} />
+      ))}
     </div>
-  );
-};
+    <ScrollBar orientation="horizontal" />
+  </ScrollArea>
+);
+
+const Title = ({ title }: { title: string }) => (
+  <h2 className="mb-2 text-xl font-semibold text-primary">{title}</h2>
+);
+
+const Home: NextPageWithLayout = () => (
+  <div className="flex flex-col gap-4">
+    <div>
+      <Title title="Te podría gustar..." />
+      <ScrollableListing listings={generateListings(10)} />
+    </div>
+
+    <div>
+      <Title title="Películas en tendencia..." />
+      <ScrollableListing listings={generateListings(10, "movie")} />
+    </div>
+
+    <div>
+      <Title title="Series en tendencia..." />
+      <ScrollableListing listings={generateListings(10, "tv")} />
+    </div>
+  </div>
+);
 
 Home.getLayout = (page) => <Layout>{page}</Layout>;
 
