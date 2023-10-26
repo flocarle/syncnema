@@ -5,13 +5,7 @@ import { useState } from "react";
 import { useDebounce } from "~/hooks/useDebounce";
 import InfiniteScroll from "react-infinite-scroller";
 import ListingCard from "~/components/molecules/ListingCard";
-
-const getTvShows = (length: number) =>
-  Array.from({ length }).map((_, index) => ({
-    id: index.toString(),
-    imageUrl: "https://image.tmdb.org/t/p/w500/9ijMGlJKqcslswWUzTEwScm82Gs.jpg",
-    name: "The Walking Dead",
-  }));
+import { generateListings } from "~/utils/listingGenerator";
 
 const TvShows: NextPageWithLayout = () => {
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
@@ -21,7 +15,7 @@ const TvShows: NextPageWithLayout = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const debouncedSearch = useDebounce(search, 500);
 
-  const [tvShows, setTvShow] = useState(getTvShows(20));
+  const [tvShows, setTvShow] = useState(generateListings(20, "tv"));
 
   return (
     <div>
@@ -36,7 +30,7 @@ const TvShows: NextPageWithLayout = () => {
 
       <InfiniteScroll
         loadMore={async () => {
-          const newTvShows = getTvShows(20);
+          const newTvShows = generateListings(20, "tv");
           await new Promise((resolve) => setTimeout(resolve, 2000));
           setTvShow([...tvShows, ...newTvShows]);
         }}
