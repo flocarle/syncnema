@@ -17,7 +17,7 @@ const Layout = ({ children, title }: LayoutProps) => {
         <Navbar items={NavbarItems} />
 
         <div className="mt-[76px] flex w-full flex-col p-8">
-          <p className="mb-4 text-xl text-primary">{title}</p>
+          {title && <p className="mb-4 text-xl text-primary">{title}</p>}
 
           {children}
         </div>
