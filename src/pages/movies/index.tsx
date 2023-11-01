@@ -3,20 +3,37 @@ import { type NextPageWithLayout } from "../_app";
 import { useState } from "react";
 import Filter from "~/components/organisms/Filter";
 import { useDebounce } from "~/hooks/useDebounce";
-import { generateListings } from "~/utils/listingGenerator";
 import ListingCard from "~/components/molecules/ListingCard";
 import InfiniteScroll from "react-infinite-scroller";
+import { QueryClient, dehydrate, useQuery } from "react-query";
+import { getMovies } from "~/services/contentService";
+import type { InferGetServerSidePropsType } from "next";
 
-const Movies: NextPageWithLayout = () => {
+type MovieProps = InferGetServerSidePropsType<typeof getServerSideProps>;
+
+const Movies: NextPageWithLayout<MovieProps> = () => {
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(0);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const debouncedSearch = useDebounce(search, 500);
 
-  //TODO: fetch from API
-  const [movies, setMovies] = useState(generateListings(20, "movie"));
+  const {
+    data: movies,
+    isLoading,
+    refetch,
+  } = useQuery(["movies"], () =>
+    getMovies({
+      genres: selectedGenres,
+      platforms: selectedPlatforms,
+      query: debouncedSearch,
+      page,
+    }),
+  );
+
+  if (isLoading) <p className="mt-4">Cargando...</p>;
 
   return (
     <div>
@@ -30,22 +47,18 @@ const Movies: NextPageWithLayout = () => {
       />
       <InfiniteScroll
         loadMore={async () => {
-          const newMovies = generateListings(20, "movie");
-          await new Promise((resolve) => setTimeout(resolve, 2000));
-          setMovies([...movies, ...newMovies]);
+          setPage((page) => page + 1);
+          await refetch();
         }}
-        hasMore={true}
+        hasMore={movies && movies.listing.length < movies.total}
         loader={<p className="mt-4">Cargando...</p>}
         className="mt-8 flex flex-col items-center justify-center"
       >
         <div className="flex w-full flex-row flex-wrap items-center justify-center gap-4">
-          {movies.map((movie) => (
+          {movies?.listing.map((movie) => (
             <ListingCard
-              key={movie.id}
-              id={movie.id}
-              name={movie.name}
-              imageUrl={movie.imageUrl}
-              type={movie.listingType}
+              key={"movieListing" + movie.id}
+              {...movie}
             ></ListingCard>
           ))}
         </div>
@@ -55,5 +68,17 @@ const Movies: NextPageWithLayout = () => {
 };
 
 Movies.getLayout = (page) => <Layout title="Películas">{page}</Layout>;
+
+export const getServerSideProps = async () => {
+  const queryClient = new QueryClient();
+
+  await queryClient.prefetchQuery(["movies"], () => getMovies({ page: 0 }));
+
+  return {
+    props: {
+      dehydratedState: dehydrate(queryClient),
+    },
+  };
+};
 
 export default Movies;

@@ -55,12 +55,7 @@ const TvShows: NextPageWithLayout<TvShowsProps> = () => {
       >
         <div className="flex w-full flex-row flex-wrap items-center justify-center gap-4">
           {tvShows?.listing.map((tvShow) => (
-            <ListingCard
-              key={tvShow.id}
-              id={tvShow.id}
-              title={tvShow.title}
-              imageUrl={tvShow.imageUrl}
-            />
+            <ListingCard key={"tvShowListing" + tvShow.id} {...tvShow} />
           ))}
         </div>
       </InfiniteScroll>
