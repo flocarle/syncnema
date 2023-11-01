@@ -49,12 +49,12 @@ const TvShows: NextPageWithLayout<TvShowsProps> = () => {
           setPage((page) => page + 1);
           await refetch();
         }}
-        hasMore={tvShows && tvShows.movies.length < tvShows.total}
+        hasMore={tvShows && tvShows.listing.length < tvShows.total}
         loader={<p className="mt-4">Cargando...</p>}
         className="mt-8 flex flex-col items-center justify-center"
       >
         <div className="flex w-full flex-row flex-wrap items-center justify-center gap-4">
-          {tvShows?.movies.map((tvShow) => (
+          {tvShows?.listing.map((tvShow) => (
             <ListingCard
               key={tvShow.id}
               id={tvShow.id}

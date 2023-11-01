@@ -8,7 +8,7 @@ export type Home = {
 };
 
 export type List = {
-  movies: Content[];
+  listing: Content[];
   page: number;
   total: number;
 };

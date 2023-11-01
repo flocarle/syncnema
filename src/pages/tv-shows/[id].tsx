@@ -1,39 +1,66 @@
 import Layout from "~/components/templates/Layout";
 import { type NextPageWithLayout } from "../_app";
 import TitleDetail from "~/components/pages/TitleDetail";
-import StreamingServices from "~/utils/constants/StreamingServices";
+import type {
+  GetServerSidePropsContext,
+  InferGetServerSidePropsType,
+} from "next";
+import { QueryClient, dehydrate, useQuery } from "react-query";
+import { byId } from "~/services/contentService";
+import { getAuth } from "@clerk/nextjs/server";
 
-const Movie: NextPageWithLayout = () => {
-  return (
-    <TitleDetail
-      cast={[
-        {
-          name: "Zooey Deschanel",
-          id: "1",
-          imageUrl:
-            "https://static.independent.co.uk/2022/04/12/12/GettyImages-1388069880.jpg",
-        },
-        {
-          name: "Jake Johnson",
-          id: "2",
-          imageUrl:
-            "https://www.earwolf.com/wp-content/uploads/2013/11/7750.jpg",
-        },
-      ]}
-      trailerUrl="https://www.youtube.com/watch?v=KKFVKcDjel0"
-      name="New Girl"
-      seasons={7}
-      tvShow
-      director="Elizabeth Meriwether"
-      description="Jess, a middle-school teacher, moves into an apartment with three men after she finds her boyfriend with another woman and breaks up with him."
-      imageUrl="https://www.themoviedb.org/t/p/original/8oCqMlKKomCArVtyOjRzMN6g40Z.jpg"
-      genres={["Comedia", "Romance"]}
-      rating={78.5}
-      whereToWatch={StreamingServices}
-    />
+type TvShowProps = InferGetServerSidePropsType<typeof getServerSideProps>;
+
+const TvShow: NextPageWithLayout<TvShowProps> = ({ tvShowId, userId }) => {
+  const { data: tvShow, isLoading } = useQuery(["movie", tvShowId], () =>
+    byId({ id: tvShowId, userId: userId ?? undefined }),
   );
+
+  if (isLoading || !tvShow) return <p>Loading...</p>;
+
+  return <TitleDetail {...tvShow} />;
 };
 
-Movie.getLayout = (page) => <Layout>{page}</Layout>;
+TvShow.getLayout = (page) => <Layout>{page}</Layout>;
 
-export default Movie;
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext,
+) => {
+  const { id } = context.query;
+  const queryClient = new QueryClient();
+  const { userId } = getAuth(context.req);
+
+  const tvShowId = id?.toString();
+
+  if (!tvShowId) {
+    return {
+      redirect: {
+        destination: "/tv-shows",
+        permanent: false,
+      },
+    };
+  }
+
+  const tvShow = await queryClient.fetchQuery(["movie", tvShowId], () =>
+    byId({ id: tvShowId, userId: userId ?? undefined }),
+  );
+
+  if (!tvShow) {
+    return {
+      redirect: {
+        destination: "/tv-shows",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {
+      dehydratedState: dehydrate(queryClient),
+      tvShowId,
+      userId,
+    },
+  };
+};
+
+export default TvShow;

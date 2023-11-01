@@ -18,26 +18,7 @@ const Movie: NextPageWithLayout<MovieProps> = ({ movieId, userId }) => {
 
   if (isLoading || !movie) return <p>Loading...</p>;
 
-  return (
-    <TitleDetail
-      id={movieId}
-      cast={movie.cast.map((cast) => ({
-        name: cast.name,
-        imageUrl: cast.imageUrl,
-      }))}
-      trailerUrl={movie.trailerUrl}
-      title={movie.title}
-      description={movie.description}
-      imageUrl={movie.imageUrl}
-      director={movie.director}
-      duration={movie.duration}
-      genres={movie.genres}
-      contentRating={movie.contentRating}
-      platforms={movie.platforms}
-      favourite={movie.favourite}
-      releaseDate={movie.releaseDate}
-    />
-  );
+  return <TitleDetail {...movie} />;
 };
 
 Movie.getLayout = (page) => <Layout>{page}</Layout>;
