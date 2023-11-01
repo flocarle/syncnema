@@ -2,11 +2,11 @@ import { axiosClient } from "./axiosClient";
 import type { ContentDetail, List } from "~/models/Content";
 
 export const getMovies = async (props: {
-  query: string;
-  platforms: string;
-  genres: string;
-  sortBy: string;
-  page: string;
+  query?: string;
+  platforms?: string[];
+  genres?: string[];
+  sortBy?: string[];
+  page?: number;
 }) => {
   const { data } = await axiosClient.get<List>(`/movies`, {
     params: {
@@ -18,11 +18,11 @@ export const getMovies = async (props: {
 };
 
 export const getSeries = async (props: {
-  query: string;
-  platforms: string;
-  genres: string;
-  sortBy: string;
-  page: string;
+  query?: string;
+  platforms?: string[];
+  genres?: string[];
+  sortBy?: string[];
+  page?: number;
 }) => {
   const { data } = await axiosClient.get<List>(`/series`, {
     params: {
