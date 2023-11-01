@@ -1,7 +1,13 @@
 import type { AppProps } from "next/app";
 import type { NextPage } from "next";
-import type { ReactElement } from "react";
+import { type ReactElement, useState } from "react";
 import { ClerkProvider } from "@clerk/nextjs";
+import {
+  Hydrate,
+  QueryClient,
+  QueryClientProvider,
+  type DehydratedState,
+} from "react-query";
 
 import "~/styles/globals.css";
 
@@ -11,6 +17,9 @@ export type NextPageWithLayout<PageProps = unknown> = NextPage<PageProps> & {
 
 type AppPropsWithLayout<T> = AppProps<T> & {
   Component: NextPageWithLayout<T>;
+  pageProps: T & {
+    dehydratedState: DehydratedState;
+  };
 };
 
 const MyApp = <T extends object>({
@@ -18,6 +27,7 @@ const MyApp = <T extends object>({
   pageProps: { ...pageProps },
 }: AppPropsWithLayout<T>) => {
   const getLayout = Component.getLayout ?? ((page) => page);
+  const [queryClient] = useState(() => new QueryClient());
 
   return (
     <ClerkProvider
@@ -41,7 +51,11 @@ const MyApp = <T extends object>({
         },
       }}
     >
-      {getLayout(<Component {...pageProps} />)}
+      <QueryClientProvider client={queryClient}>
+        <Hydrate state={pageProps.dehydratedState}>
+          {getLayout(<Component {...pageProps} />)}
+        </Hydrate>
+      </QueryClientProvider>
     </ClerkProvider>
   );
 };
