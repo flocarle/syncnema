@@ -5,16 +5,17 @@ import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
 } from "next";
-import { QueryClient, dehydrate, useQuery } from "react-query";
+import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
 import { byId } from "~/services/contentService";
 import { getAuth } from "@clerk/nextjs/server";
 
 type MovieProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
 const Movie: NextPageWithLayout<MovieProps> = ({ movieId, userId }) => {
-  const { data: movie, isLoading } = useQuery(["movie", movieId], () =>
-    byId({ id: movieId, userId: userId ?? undefined }),
-  );
+  const { data: movie, isLoading } = useQuery({
+    queryKey: ["movie", movieId],
+    queryFn: () => byId({ id: movieId, userId: userId ?? undefined }),
+  });
 
   if (isLoading || !movie) return <p>Loading...</p>;
 
@@ -41,9 +42,10 @@ export const getServerSideProps = async (
     };
   }
 
-  const movie = await queryClient.fetchQuery(["movie", movieId], () =>
-    byId({ id: movieId, userId: userId ?? undefined }),
-  );
+  const movie = await queryClient.fetchQuery({
+    queryKey: ["movie", movieId],
+    queryFn: () => byId({ id: movieId, userId: userId ?? undefined }),
+  });
 
   if (!movie) {
     return {

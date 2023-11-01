@@ -10,7 +10,7 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 import { useSession } from "@clerk/nextjs";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 import {
   add as addRating,
   update as updateRating,

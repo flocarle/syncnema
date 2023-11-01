@@ -6,7 +6,7 @@ import { useDebounce } from "~/hooks/useDebounce";
 import InfiniteScroll from "react-infinite-scroller";
 import ListingCard from "~/components/molecules/ListingCard";
 import type { InferGetServerSidePropsType } from "next";
-import { QueryClient, dehydrate, useQuery } from "react-query";
+import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
 import { getSeries } from "~/services/contentService";
 
 type TvShowsProps = InferGetServerSidePropsType<typeof getServerSideProps>;
@@ -22,14 +22,16 @@ const TvShows: NextPageWithLayout<TvShowsProps> = () => {
     data: tvShows,
     isLoading,
     refetch,
-  } = useQuery(["series"], () =>
-    getSeries({
-      genres: selectedGenres,
-      platforms: selectedPlatforms,
-      query: debouncedSearch,
-      page,
-    }),
-  );
+  } = useQuery({
+    queryKey: ["series"],
+    queryFn: () =>
+      getSeries({
+        genres: selectedGenres,
+        platforms: selectedPlatforms,
+        query: debouncedSearch,
+        page,
+      }),
+  });
 
   if (isLoading) <p className="mt-4">Cargando...</p>;
 
@@ -68,7 +70,10 @@ TvShows.getLayout = (page) => <Layout title="Series">{page}</Layout>;
 export const getServerSideProps = async () => {
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery(["series"], () => getSeries({ page: 0 }));
+  await queryClient.prefetchQuery({
+    queryKey: ["series"],
+    queryFn: () => getSeries({ page: 0 }),
+  });
 
   return {
     props: {

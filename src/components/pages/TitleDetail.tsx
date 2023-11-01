@@ -7,7 +7,7 @@ import { AiFillHeart } from "react-icons/ai";
 import { cn } from "~/utils";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import type { ContentDetail } from "~/models/Content";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 import {
   add as addFavouriteFn,
   remove as removeFavouriteFn,

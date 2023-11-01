@@ -3,11 +3,10 @@ import type { NextPage } from "next";
 import { type ReactElement, useState } from "react";
 import { ClerkProvider } from "@clerk/nextjs";
 import {
-  Hydrate,
   QueryClient,
   QueryClientProvider,
   type DehydratedState,
-} from "react-query";
+} from "@tanstack/react-query";
 
 import "~/styles/globals.css";
 
@@ -51,9 +50,7 @@ const MyApp = <T extends object>({
       }}
     >
       <QueryClientProvider client={queryClient}>
-        <Hydrate state={pageProps.dehydratedState}>
-          {getLayout(<Component {...pageProps} />)}
-        </Hydrate>
+        {getLayout(<Component {...pageProps} />)}
       </QueryClientProvider>
     </ClerkProvider>
   );

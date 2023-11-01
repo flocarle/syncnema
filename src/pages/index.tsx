@@ -7,7 +7,7 @@ import {
   type InferGetServerSidePropsType,
   type GetServerSidePropsContext,
 } from "next";
-import { QueryClient, dehydrate, useQuery } from "react-query";
+import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
 import { get } from "~/services/homeService";
 import type { Content } from "~/models/Content";
 import { getAuth } from "@clerk/nextjs/server";
@@ -65,9 +65,10 @@ export const getServerSideProps = async (
   const queryClient = new QueryClient();
   const { userId } = getAuth(context.req);
 
-  await queryClient.prefetchQuery(["home"], () =>
-    get({ userId: userId ?? undefined }),
-  );
+  await queryClient.prefetchQuery({
+    queryKey: ["home"],
+    queryFn: () => get({ userId: userId ?? undefined }),
+  });
 
   return {
     props: {

@@ -8,7 +8,7 @@ import {
 } from "next";
 import { get } from "~/services/favouritesService";
 import { getAuth } from "@clerk/nextjs/server";
-import { QueryClient, dehydrate, useQuery } from "react-query";
+import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
 import type { Content } from "~/models/Content";
 
 const FavoritesGrid = ({ listings }: { listings: Content[] }) => (
@@ -67,9 +67,10 @@ export const getServerSideProps = async (
     };
   }
 
-  await queryClient.prefetchQuery(["favorites"], () =>
-    get({ userId: userId ?? undefined }),
-  );
+  await queryClient.prefetchQuery({
+    queryKey: ["favorites"],
+    queryFn: () => get({ userId: userId ?? undefined }),
+  });
 
   return {
     props: {

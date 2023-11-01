@@ -5,16 +5,17 @@ import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
 } from "next";
-import { QueryClient, dehydrate, useQuery } from "react-query";
+import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
 import { byId } from "~/services/contentService";
 import { getAuth } from "@clerk/nextjs/server";
 
 type TvShowProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
 const TvShow: NextPageWithLayout<TvShowProps> = ({ tvShowId, userId }) => {
-  const { data: tvShow, isLoading } = useQuery(["movie", tvShowId], () =>
-    byId({ id: tvShowId, userId: userId ?? undefined }),
-  );
+  const { data: tvShow, isLoading } = useQuery({
+    queryKey: ["movie", tvShowId],
+    queryFn: () => byId({ id: tvShowId, userId: userId ?? undefined }),
+  });
 
   if (isLoading || !tvShow) return <p>Loading...</p>;
 
@@ -41,9 +42,10 @@ export const getServerSideProps = async (
     };
   }
 
-  const tvShow = await queryClient.fetchQuery(["movie", tvShowId], () =>
-    byId({ id: tvShowId, userId: userId ?? undefined }),
-  );
+  const tvShow = await queryClient.fetchQuery({
+    queryKey: ["movie", tvShowId],
+    queryFn: () => byId({ id: tvShowId, userId: userId ?? undefined }),
+  });
 
   if (!tvShow) {
     return {

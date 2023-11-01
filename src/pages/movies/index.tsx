@@ -5,7 +5,7 @@ import Filter from "~/components/organisms/Filter";
 import { useDebounce } from "~/hooks/useDebounce";
 import ListingCard from "~/components/molecules/ListingCard";
 import InfiniteScroll from "react-infinite-scroller";
-import { QueryClient, dehydrate, useQuery } from "react-query";
+import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
 import { getMovies } from "~/services/contentService";
 import type { InferGetServerSidePropsType } from "next";
 
@@ -24,14 +24,16 @@ const Movies: NextPageWithLayout<MovieProps> = () => {
     data: movies,
     isLoading,
     refetch,
-  } = useQuery(["movies"], () =>
-    getMovies({
-      genres: selectedGenres,
-      platforms: selectedPlatforms,
-      query: debouncedSearch,
-      page,
-    }),
-  );
+  } = useQuery({
+    queryKey: ["movies"],
+    queryFn: () =>
+      getMovies({
+        genres: selectedGenres,
+        platforms: selectedPlatforms,
+        query: debouncedSearch,
+        page,
+      }),
+  });
 
   if (isLoading) <p className="mt-4">Cargando...</p>;
 
@@ -72,7 +74,10 @@ Movies.getLayout = (page) => <Layout title="Películas">{page}</Layout>;
 export const getServerSideProps = async () => {
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery(["movies"], () => getMovies({ page: 0 }));
+  await queryClient.prefetchQuery({
+    queryKey: ["movies"],
+    queryFn: () => getMovies({ page: 0 }),
+  });
 
   return {
     props: {
