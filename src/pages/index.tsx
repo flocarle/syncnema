@@ -3,13 +3,20 @@ import { type NextPageWithLayout } from "./_app";
 import ListingCard from "~/components/molecules/ListingCard";
 
 import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
-import { type Listing, generateListings } from "~/utils/listingGenerator";
+import {
+  type InferGetServerSidePropsType,
+  type GetServerSidePropsContext,
+} from "next";
+import { QueryClient, dehydrate, useQuery } from "react-query";
+import { get } from "~/services/homeService";
+import type { Content } from "~/models/Content";
+import { getAuth } from "@clerk/nextjs/server";
 
-const ScrollableListing = ({ listings }: { listings: Listing[] }) => (
+const ScrollableListing = ({ listings }: { listings: Content[] }) => (
   <ScrollArea>
     <div className="flex gap-4">
-      {listings.map((listing) => (
-        <ListingCard key={listing.id} type={listing.listingType} {...listing} />
+      {listings.map((listing, index) => (
+        <ListingCard key={`${listing.id}-${index}`} {...listing} />
       ))}
     </div>
     <ScrollBar orientation="horizontal" />
@@ -20,25 +27,54 @@ const Title = ({ title }: { title: string }) => (
   <h2 className="mb-2 text-xl font-semibold text-primary">{title}</h2>
 );
 
-const Home: NextPageWithLayout = () => (
-  <div className="flex flex-col gap-4">
-    <div>
-      <Title title="Te podría gustar..." />
-      <ScrollableListing listings={generateListings(10)} />
-    </div>
+type HomeProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
-    <div>
-      <Title title="Películas en tendencia..." />
-      <ScrollableListing listings={generateListings(10, "movie")} />
-    </div>
+const Home: NextPageWithLayout<HomeProps> = ({ userId }) => {
+  const { data, isLoading } = useQuery({
+    queryKey: ["home"],
+    queryFn: () => get({ userId: userId ?? undefined }),
+  });
 
-    <div>
-      <Title title="Series en tendencia..." />
-      <ScrollableListing listings={generateListings(10, "tv")} />
+  if (isLoading) return <p>Loading...</p>;
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div>
+        <Title title="Te podría gustar..." />
+        <ScrollableListing listings={data?.recommendations ?? []} />
+      </div>
+
+      <div>
+        <Title title="Películas en tendencia..." />
+        <ScrollableListing listings={data?.movies ?? []} />
+      </div>
+
+      <div>
+        <Title title="Series en tendencia..." />
+        <ScrollableListing listings={data?.series ?? []} />
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 Home.getLayout = (page) => <Layout>{page}</Layout>;
+
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext,
+) => {
+  const queryClient = new QueryClient();
+  const { userId } = getAuth(context.req);
+
+  await queryClient.prefetchQuery(["home"], () =>
+    get({ userId: userId ?? undefined }),
+  );
+
+  return {
+    props: {
+      dehydratedState: dehydrate(queryClient),
+      userId: userId,
+    },
+  };
+};
 
 export default Home;
