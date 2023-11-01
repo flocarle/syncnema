@@ -1,20 +1,14 @@
 import Link from "next/link";
 import { Card } from "../ui/card";
-
-type ImageCardProps = {
-  id: string;
-  imageUrl: string;
-  name: string;
-  type: "movie" | "tv";
-};
+import type { Content } from "~/models/Content";
 
 const MAP_TYPE_TO_URL = {
-  movie: "/movies",
-  tv: "/tv-shows",
+  Movie: "/movies",
+  Serie: "/tv-shows",
 } as const;
 
-const ListingCard = ({ id, imageUrl, name, type }: ImageCardProps) => {
-  const redirectUrl = `${MAP_TYPE_TO_URL[type]}/${id}`;
+const ListingCard = ({ id, imageUrl, title, type }: Content) => {
+  const redirectUrl = type ? `${MAP_TYPE_TO_URL[type]}/${id}` : `/movies/${id}`;
 
   return (
     <Card
@@ -27,7 +21,7 @@ const ListingCard = ({ id, imageUrl, name, type }: ImageCardProps) => {
         <div className="h-full w-full rounded-xl bg-black bg-opacity-0 transition-all duration-200 group-hover:bg-opacity-60" />
 
         <p className="absolute left-0 top-0 flex h-full w-full items-center justify-center text-center text-xl font-bold tracking-wide text-white opacity-0 transition-all duration-200 group-hover:opacity-100">
-          {name}
+          {title}
         </p>
       </Link>
     </Card>

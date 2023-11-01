@@ -15,11 +15,10 @@ export type NextPageWithLayout<PageProps = unknown> = NextPage<PageProps> & {
   getLayout?: (page: ReactElement<PageProps>) => ReactElement;
 };
 
-type AppPropsWithLayout<T> = AppProps<T> & {
+type AppPropsWithLayout<T> = AppProps<
+  T & { dehydratedState: DehydratedState }
+> & {
   Component: NextPageWithLayout<T>;
-  pageProps: T & {
-    dehydratedState: DehydratedState;
-  };
 };
 
 const MyApp = <T extends object>({

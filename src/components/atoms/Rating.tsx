@@ -9,11 +9,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
+import { useSession } from "@clerk/nextjs";
+import { useMutation } from "react-query";
+import {
+  add as addRating,
+  update as updateRating,
+} from "~/services/ratingService";
 
 type RatingProps = {
-  peopleRating: number;
-  userRating: number;
-  setUserRating: (rating: number) => void;
+  contentRating: number;
+  contentId: string;
+  userRating?: number;
 };
 
 const RatingModal = ({
@@ -71,8 +77,33 @@ const RatingModal = ({
   );
 };
 
-const Rating = ({ peopleRating, userRating, setUserRating }: RatingProps) => {
-  const ratingInScale = Math.floor((peopleRating * 10) / 100);
+const Rating = ({ userRating, contentRating, contentId }: RatingProps) => {
+  const ratingInScale = Math.floor((contentRating * 10) / 100);
+  const { session } = useSession();
+
+  const { mutate: rate } = useMutation({
+    mutationFn: ({
+      contentId,
+      userId,
+      score,
+    }: {
+      contentId: string;
+      userId: string;
+      score: number;
+    }) => addRating({ contentId, userId, score }),
+  });
+
+  const { mutate: updateRate } = useMutation({
+    mutationFn: ({
+      contentId,
+      userId,
+      score,
+    }: {
+      contentId: string;
+      userId: string;
+      score: number;
+    }) => updateRating({ contentId, userId, score }),
+  });
 
   return (
     <div className="flex flex-col gap-y-3">
@@ -88,29 +119,39 @@ const Rating = ({ peopleRating, userRating, setUserRating }: RatingProps) => {
         </div>
       </div>
 
-      <div className="flex flex-col gap-1">
-        <p className="text-lg font-semibold">Tu puntuación</p>
+      {session && (
+        <div className="flex flex-col gap-1">
+          <p className="text-lg font-semibold">Tu puntuación</p>
 
-        {userRating > 0 ? (
-          <div className="flex">
-            <p className="text-base">
-              <span className="text-lg font-bold">{userRating}</span>/10
-            </p>
+          {userRating ? (
+            <div className="flex">
+              <p className="text-base">
+                <span className="text-lg font-bold">{userRating}</span>/10
+              </p>
 
+              <RatingModal
+                userRating={userRating}
+                setUserRating={(score) =>
+                  updateRate({
+                    contentId,
+                    userId: session.id,
+                    score,
+                  })
+                }
+                trigger={<AiFillEdit size={24} />}
+              />
+            </div>
+          ) : (
             <RatingModal
-              userRating={userRating}
-              setUserRating={setUserRating}
-              trigger={<AiFillEdit size={24} />}
+              userRating={0}
+              setUserRating={(score) =>
+                rate({ contentId, userId: session.id, score })
+              }
+              trigger={<AiOutlinePlusCircle size={24} />}
             />
-          </div>
-        ) : (
-          <RatingModal
-            userRating={userRating}
-            setUserRating={setUserRating}
-            trigger={<AiOutlinePlusCircle size={24} />}
-          />
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

@@ -2,27 +2,18 @@ import Link from "next/link";
 import { Card } from "../ui/card";
 import CastCard from "../molecules/CastCard";
 import StreamingBadge from "../atoms/StreamingBadge";
-import { type StreamingService } from "~/utils/constants/StreamingServices";
 import Rating from "../atoms/Rating";
-import { useState } from "react";
 import { AiFillHeart } from "react-icons/ai";
 import { cn } from "~/utils";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
+import type { ContentDetail } from "~/models/Content";
+import { useMutation } from "react-query";
+import {
+  add as addFavouriteFn,
+  remove as removeFavouriteFn,
+} from "~/services/favouritesService";
 
-type TitleDetailProps = {
-  name: string;
-  description: string;
-  imageUrl: string;
-  trailerUrl?: string;
-  whereToWatch: StreamingService[];
-  duration?: string;
-  director: string;
-  genres: string[];
-  rating: number;
-  cast: { name: string; id: string; imageUrl: string }[];
-  tvShow?: boolean;
-  seasons?: number;
-};
+import { useSession } from "@clerk/nextjs";
 
 const KeyName = ({ name, value }: { name: string; value: string }) => (
   <div className="flex items-center gap-x-2">
@@ -33,21 +24,44 @@ const KeyName = ({ name, value }: { name: string; value: string }) => (
 );
 
 const TitleDetail = ({
-  name,
+  id,
+  title,
   description,
   imageUrl,
   trailerUrl,
-  whereToWatch,
+  platforms,
   duration,
   director,
   genres,
-  rating,
+  contentRating,
   cast,
-  tvShow,
   seasons,
-}: TitleDetailProps) => {
-  const [userRating, setUserRating] = useState(0);
-  const [favorite, setIsFavorite] = useState(false);
+  favourite,
+  releaseDate,
+  creator,
+  userRating,
+}: ContentDetail) => {
+  const { session } = useSession();
+
+  const { mutate: addFavourite } = useMutation({
+    mutationFn: ({
+      contentId,
+      userId,
+    }: {
+      contentId: string;
+      userId: string;
+    }) => addFavouriteFn({ contentId, userId }),
+  });
+
+  const { mutate: removeFavourite } = useMutation({
+    mutationFn: ({
+      contentId,
+      userId,
+    }: {
+      contentId: string;
+      userId: string;
+    }) => removeFavouriteFn({ contentId, userId }),
+  });
 
   return (
     <div className="flex flex-col gap-y-5">
@@ -72,28 +86,36 @@ const TitleDetail = ({
 
         <div className="flex w-3/5 flex-col justify-between py-3">
           <div>
-            <p className="text-3xl font-bold uppercase">{name}</p>
+            <p className="text-3xl font-bold uppercase">{title}</p>
 
             <p className="text-lg">{description}</p>
           </div>
 
           <div>
-            {tvShow
-              ? seasons && (
-                  <KeyName name="Temporadas" value={seasons.toString()} />
-                )
-              : duration && <KeyName name="Duración" value={duration} />}
+            <KeyName name="Fecha de estreno" value={releaseDate} />
+
+            {seasons && (
+              <KeyName name="Temporadas" value={seasons.toString()} />
+            )}
+
+            {duration && <KeyName name="Duración" value={`${duration}m`} />}
 
             <KeyName name="Géneros" value={genres.join(", ")} />
 
-            <KeyName name="Dirigida por" value={director} />
+            {director && <KeyName name="Dirigida por" value={director} />}
+
+            {creator && <KeyName name="Creada por" value={creator} />}
+
             <div className="flex gap-x-3">
               <p className="text-xl font-semibold">Dónde ver: </p>
 
-              {whereToWatch.map((streamingService, index) => (
+              {platforms.map((streamingService, index) => (
                 <StreamingBadge
                   key={index}
-                  streamingService={streamingService}
+                  streamingService={{
+                    logo: streamingService.logo,
+                    name: streamingService.name,
+                  }}
                 />
               ))}
             </div>
@@ -101,19 +123,25 @@ const TitleDetail = ({
         </div>
 
         <div className="flex w-2/5 flex-1 flex-col gap-y-4">
-          <AiFillHeart
-            className={cn(
-              "cursor-pointer self-end",
-              favorite ? "scale-110 text-red-600" : "text-gray-400 ",
-            )}
-            onClick={() => setIsFavorite(!favorite)}
-            fontSize="50px"
-          />
+          {session && (
+            <AiFillHeart
+              className={cn(
+                "cursor-pointer self-end",
+                favourite ? "scale-110 text-red-600" : "text-gray-400 ",
+              )}
+              onClick={() =>
+                favourite
+                  ? removeFavourite({ contentId: id, userId: session.id })
+                  : addFavourite({ contentId: id, userId: session.id })
+              }
+              fontSize="50px"
+            />
+          )}
 
           <Rating
-            peopleRating={rating}
+            contentRating={contentRating}
+            contentId={id}
             userRating={userRating}
-            setUserRating={setUserRating}
           />
         </div>
       </div>
@@ -122,8 +150,8 @@ const TitleDetail = ({
 
       <ScrollArea>
         <div className="flex gap-x-2">
-          {cast.map(({ name, id, imageUrl }) => (
-            <CastCard key={id} name={name} imageUrl={imageUrl} />
+          {cast.map(({ name, imageUrl }) => (
+            <CastCard key={name} name={name} imageUrl={imageUrl} />
           ))}
         </div>
 
