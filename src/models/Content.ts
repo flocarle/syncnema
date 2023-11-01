@@ -7,13 +7,7 @@ export type Home = {
   recommendations: Content[];
 };
 
-export type Movies = {
-  movies: Content[];
-  page: number;
-  total: number;
-};
-
-export type Series = {
+export type List = {
   movies: Content[];
   page: number;
   total: number;

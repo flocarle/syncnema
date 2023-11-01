@@ -1,35 +1,39 @@
 import { axiosClient } from "./axiosClient";
-import type { ContentDetail, Movies, Series } from "~/models/Content";
+import type { ContentDetail, List } from "~/models/Content";
 
-export const getMovies = async (
-  query: string,
-  platforms: string,
-  genres: string,
-  sortBy: string,
-  page: string,
-) => {
-  const { data } = await axiosClient.get<Movies>(
-    `/movies?query=${query}&platforms=${platforms}&genres=${genres}&sortBy=${sortBy}&page=${page}`,
-  );
-
-  return data;
-};
-
-export const get = async (
-  query: string,
-  platforms: string,
-  genres: string,
-  sortBy: string,
-  page: string,
-) => {
-  const { data } = await axiosClient.get<Series>(
-    `/series?query=${query}&platforms=${platforms}&genres=${genres}&sortBy=${sortBy}&page=${page}`,
-  );
+export const getMovies = async (props: {
+  query: string;
+  platforms: string;
+  genres: string;
+  sortBy: string;
+  page: string;
+}) => {
+  const { data } = await axiosClient.get<List>(`/movies`, {
+    params: {
+      ...props,
+    },
+  });
 
   return data;
 };
 
-export const byId = async (id: string) => {
+export const getSeries = async (props: {
+  query: string;
+  platforms: string;
+  genres: string;
+  sortBy: string;
+  page: string;
+}) => {
+  const { data } = await axiosClient.get<List>(`/series`, {
+    params: {
+      ...props,
+    },
+  });
+
+  return data;
+};
+
+export const byId = async ({ id }: { id: string; userId?: string }) => {
   const { data } = await axiosClient.get<ContentDetail>(`/content/${id}`);
 
   return data;
