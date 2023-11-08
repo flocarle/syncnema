@@ -9,12 +9,18 @@ import {
 import { get } from "~/services/favouritesService";
 import { getAuth } from "@clerk/nextjs/server";
 import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
-import type { Content } from "~/models/Content";
+import type { Content, ContentType } from "~/models/Content";
 
-const FavoritesGrid = ({ listings }: { listings: Content[] }) => (
+const FavoritesGrid = ({
+  listings,
+  type,
+}: {
+  listings: Content[];
+  type: ContentType;
+}) => (
   <div className="flex flex-wrap justify-center gap-4">
-    {listings.map((listing) => (
-      <ListingCard key={listing.id} {...listing} />
+    {listings.map(({ record: listing }) => (
+      <ListingCard key={listing.id} {...listing} type={type} />
     ))}
   </div>
 );
@@ -40,11 +46,11 @@ const Favorites: NextPageWithLayout<FavoritesProps> = ({ userId }) => {
       </TabsList>
 
       <TabsContent value="movies">
-        <FavoritesGrid listings={favorites.movies} />
+        <FavoritesGrid listings={favorites.movies} type="Movie" />
       </TabsContent>
 
       <TabsContent value="tvShows">
-        <FavoritesGrid listings={favorites.series} />
+        <FavoritesGrid listings={favorites.series} type="Serie" />
       </TabsContent>
     </Tabs>
   );

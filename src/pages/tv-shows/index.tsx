@@ -6,8 +6,8 @@ import { useDebounce } from "~/hooks/useDebounce";
 import InfiniteScroll from "react-infinite-scroller";
 import ListingCard from "~/components/molecules/ListingCard";
 import type { InferGetServerSidePropsType } from "next";
-import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
-import { getSeries } from "~/services/contentService";
+import { QueryClient, dehydrate } from "@tanstack/react-query";
+import { useListings } from "~/hooks/useListings";
 
 type TvShowsProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
@@ -15,22 +15,18 @@ const TvShows: NextPageWithLayout<TvShowsProps> = () => {
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
   const [search, setSearch] = useState("");
+
   const debouncedSearch = useDebounce(search, 500);
-  const [page, setPage] = useState(0);
 
   const {
-    data: tvShows,
+    listings: tvShows,
     isLoading,
-    refetch,
-  } = useQuery({
-    queryKey: ["series"],
-    queryFn: () =>
-      getSeries({
-        genres: selectedGenres,
-        platforms: selectedPlatforms,
-        query: debouncedSearch,
-        page,
-      }),
+    hasNextPage,
+    fetchNextPage,
+  } = useListings("serie", {
+    genres: selectedGenres,
+    platforms: selectedPlatforms,
+    query: debouncedSearch,
   });
 
   if (isLoading) <p className="mt-4">Cargando...</p>;
@@ -47,17 +43,18 @@ const TvShows: NextPageWithLayout<TvShowsProps> = () => {
       />
 
       <InfiniteScroll
-        loadMore={async () => {
-          setPage((page) => page + 1);
-          await refetch();
-        }}
-        hasMore={tvShows && tvShows.listing.length < tvShows.total}
+        loadMore={() => fetchNextPage()}
+        hasMore={hasNextPage}
         loader={<p className="mt-4">Cargando...</p>}
         className="mt-8 flex flex-col items-center justify-center"
       >
         <div className="flex w-full flex-row flex-wrap items-center justify-center gap-4">
-          {tvShows?.listing.map((tvShow) => (
-            <ListingCard key={"tvShowListing" + tvShow.id} {...tvShow} />
+          {tvShows?.map(({ record: tvShow }) => (
+            <ListingCard
+              key={"tvShowListing" + tvShow.id}
+              {...tvShow}
+              type="Serie"
+            />
           ))}
         </div>
       </InfiniteScroll>
@@ -67,13 +64,13 @@ const TvShows: NextPageWithLayout<TvShowsProps> = () => {
 
 TvShows.getLayout = (page) => <Layout title="Series">{page}</Layout>;
 
-export const getServerSideProps = async () => {
+export const getServerSideProps = () => {
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery({
-    queryKey: ["series"],
-    queryFn: () => getSeries({ page: 0 }),
-  });
+  // await queryClient.prefetchQuery({
+  //   queryKey: ["series"],
+  //   queryFn: () => getSeries({ page: 0 }),
+  // });
 
   return {
     props: {

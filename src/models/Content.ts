@@ -1,28 +1,37 @@
 import type { Person } from "./Person";
 import type { Platform } from "./Platform";
 
-export type Home = {
-  movies: Content[];
-  series: Content[];
-  recommendations: Content[];
+export type HomeContent = {
+  id: string;
+  title: string;
+  imageUrl: string;
+  type: ContentType;
 };
 
-export type List = {
-  listing: Content[];
-  page: number;
+export type Home = {
+  movies: HomeContent[];
+  series: HomeContent[];
+  recommendations: HomeContent[];
+};
+
+export type ContentList = {
+  records: Content[];
   total: number;
+  page: number;
 };
 
 export type ContentType = "Movie" | "Serie";
 
 export type Content = {
-  id: string;
-  title: string;
-  imageUrl: string;
-  type?: ContentType;
+  score: number;
+  record: {
+    id: string;
+    title: string;
+    imageUrl: string;
+  };
 };
 
-export type ContentDetail = Content & {
+export type ContentDetail = Content["record"] & {
   trailerUrl: string;
   description: string;
   releaseDate: string;

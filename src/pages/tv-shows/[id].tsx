@@ -43,7 +43,7 @@ export const getServerSideProps = async (
   }
 
   const tvShow = await queryClient.fetchQuery({
-    queryKey: ["movie", tvShowId],
+    queryKey: ["serie", tvShowId],
     queryFn: () => byId({ id: tvShowId, userId: userId ?? undefined }),
   });
 

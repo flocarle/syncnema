@@ -9,10 +9,10 @@ import {
 } from "next";
 import { QueryClient, dehydrate, useQuery } from "@tanstack/react-query";
 import { get } from "~/services/homeService";
-import type { Content } from "~/models/Content";
+import type { HomeContent } from "~/models/Content";
 import { getAuth } from "@clerk/nextjs/server";
 
-const ScrollableListing = ({ listings }: { listings: Content[] }) => (
+const ScrollableListing = ({ listings }: { listings: HomeContent[] }) => (
   <ScrollArea>
     <div className="flex gap-4">
       {listings.map((listing, index) => (
@@ -73,7 +73,7 @@ export const getServerSideProps = async (
   return {
     props: {
       dehydratedState: dehydrate(queryClient),
-      userId: userId,
+      userId,
     },
   };
 };

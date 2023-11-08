@@ -4,7 +4,7 @@ import applyCaseMiddleware from "axios-case-converter";
 const axiosClient = applyCaseMiddleware(
   axios.create({
     withCredentials: true,
-    baseURL: "http://localhost:3001",
+    baseURL: "https://env-8954386.web.elasticloud.uy",
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",

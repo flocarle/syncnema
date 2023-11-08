@@ -7,7 +7,9 @@ const MAP_TYPE_TO_URL = {
   Serie: "/tv-shows",
 } as const;
 
-const ListingCard = ({ id, imageUrl, title, type }: Content) => {
+type ListingCardProps = Content["record"] & { type: "Movie" | "Serie" };
+
+const ListingCard = ({ id, imageUrl, title, type }: ListingCardProps) => {
   const redirectUrl = type ? `${MAP_TYPE_TO_URL[type]}/${id}` : `/movies/${id}`;
 
   return (

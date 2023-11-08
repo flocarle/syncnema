@@ -1,32 +1,22 @@
 import { axiosClient } from "./axiosClient";
-import type { ContentDetail, List } from "~/models/Content";
+import type { ContentDetail, ContentList } from "~/models/Content";
 
-export const getMovies = async (props: {
+type ContentProps = {
   query?: string;
   platforms?: string[];
   genres?: string[];
-  sortBy?: string[];
   page?: number;
-}) => {
-  const { data } = await axiosClient.get<List>(`/movies`, {
-    params: {
-      ...props,
-    },
-  });
-
-  return data;
+  type: "movie" | "serie";
 };
 
-export const getSeries = async (props: {
-  query?: string;
-  platforms?: string[];
-  genres?: string[];
-  sortBy?: string[];
-  page?: number;
-}) => {
-  const { data } = await axiosClient.get<List>(`/series`, {
+export const PAGE_SIZE = 20;
+
+export const getListings = async (props: ContentProps) => {
+  const { data } = await axiosClient.get<ContentList>(`/contents`, {
     params: {
+      size: PAGE_SIZE,
       ...props,
+      query: props.query !== "" ? props.query : undefined,
     },
   });
 
@@ -34,7 +24,7 @@ export const getSeries = async (props: {
 };
 
 export const byId = async ({ id }: { id: string; userId?: string }) => {
-  const { data } = await axiosClient.get<ContentDetail>(`/content/${id}`);
+  const { data } = await axiosClient.get<ContentDetail>(`/contents/${id}`);
 
   return data;
 };
