@@ -31,6 +31,7 @@ export type Content = {
   };
 };
 
+// TODO: change this.
 export type ContentDetail = Content["record"] & {
   trailerUrl: string;
   description: string;

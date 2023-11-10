@@ -1,12 +1,12 @@
 import { axiosClient } from "./axiosClient";
-import type { ContentDetail, ContentList } from "~/models/Content";
+import type { ContentDetail, ContentList, ContentType } from "~/models/Content";
 
 type ContentProps = {
   query?: string;
   platforms?: string[];
   genres?: string[];
   page?: number;
-  type: "movie" | "serie";
+  type: ContentType;
 };
 
 export const PAGE_SIZE = 20;

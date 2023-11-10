@@ -1,5 +1,5 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
-import type { Content, ContentList } from "~/models/Content";
+import type { Content, ContentList, ContentType } from "~/models/Content";
 import { PAGE_SIZE, getListings } from "~/services/contentService";
 
 type UseListingsParams = {
@@ -9,7 +9,7 @@ type UseListingsParams = {
 };
 
 export const useListings = (
-  type: "movie" | "serie",
+  type: ContentType,
   { genres, platforms, query }: UseListingsParams,
 ) => {
   const result = useInfiniteQuery<ContentList>({

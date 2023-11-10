@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { Card } from "../ui/card";
-import type { Content } from "~/models/Content";
+import type { Content, ContentType } from "~/models/Content";
 
 const MAP_TYPE_TO_URL = {
   Movie: "/movies",
   Serie: "/tv-shows",
 } as const;
 
-type ListingCardProps = Content["record"] & { type: "Movie" | "Serie" };
+type ListingCardProps = Content["record"] & { type: ContentType };
 
 const ListingCard = ({ id, imageUrl, title, type }: ListingCardProps) => {
   const redirectUrl = type ? `${MAP_TYPE_TO_URL[type]}/${id}` : `/movies/${id}`;
