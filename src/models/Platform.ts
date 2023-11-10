@@ -1,4 +1,4 @@
 export type Platform = {
   name: string;
-  logo: string;
+  image: string; // can return an empty string
 };

@@ -23,7 +23,7 @@ const TvShows: NextPageWithLayout<TvShowsProps> = () => {
     isLoading,
     hasNextPage,
     fetchNextPage,
-  } = useListings("serie", {
+  } = useListings("Serie", {
     genres: selectedGenres,
     platforms: selectedPlatforms,
     query: debouncedSearch,

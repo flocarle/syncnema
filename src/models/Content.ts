@@ -31,19 +31,26 @@ export type Content = {
   };
 };
 
-// TODO: change this.
-export type ContentDetail = Content["record"] & {
+export type ContentDetail = {
+  id: string;
+  title: string;
+  imageUrl: string; //TODO
   trailerUrl: string;
-  description: string;
-  releaseDate: string;
-  contentRating: number;
-  duration?: number; //If is a movie
-  seasons?: number; //If is a tv show
-  director?: string; //If is a movie
-  creator?: string; //If is a tv show
-  genres: string[];
-  platforms: Platform[];
-  cast: Person[];
-  userRating?: number;
+  combinedPlot: string;
+  combinedReleaseDate: string;
+  contentRating: string;
+  combinedRuntime: number;
+  combinedBudget: number; // TODO
+
+  director: string | null;
+  creator: string; // can return an empty string
+
+  combinedGenres: string;
+  rating: number;
   favourite: boolean;
+  userRating: number | null;
+  totalRating: number;
+
+  cast: Person[];
+  platforms: Platform[];
 };

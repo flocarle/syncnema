@@ -23,7 +23,7 @@ const Movies: NextPageWithLayout<MovieProps> = () => {
     isLoading,
     hasNextPage,
     fetchNextPage,
-  } = useListings("movie", {
+  } = useListings("Movie", {
     genres: selectedGenres,
     platforms: selectedPlatforms,
     query: debouncedSearch,

@@ -8,7 +8,9 @@ type ImageCardProps = {
 const CastCard = ({ imageUrl, name }: ImageCardProps) => (
   <Card
     style={{
-      backgroundImage: `url(${imageUrl})`,
+      backgroundImage: `${
+        imageUrl === "" ? "images/noCastImage.webp" : `url(${imageUrl})`
+      }`,
     }}
     className={"group relative h-48 w-40 bg-cover"}
   >

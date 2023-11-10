@@ -1,4 +1,4 @@
 export type Person = {
   name: string;
-  imageUrl: string;
+  image: string; // can return an empty string
 };

@@ -14,6 +14,7 @@ import {
 } from "~/services/favouritesService";
 
 import { useSession } from "@clerk/nextjs";
+import { z } from "zod";
 
 const KeyName = ({ name, value }: { name: string; value: string }) => (
   <div className="flex items-center gap-x-2">
@@ -26,20 +27,20 @@ const KeyName = ({ name, value }: { name: string; value: string }) => (
 const TitleDetail = ({
   id,
   title,
-  description,
+  combinedPlot,
   imageUrl,
   trailerUrl,
-  platforms,
-  duration,
+  combinedReleaseDate,
+  combinedGenres,
+  combinedRuntime,
+  combinedBudget,
   director,
-  genres,
-  contentRating,
-  cast,
-  seasons,
-  favourite,
-  releaseDate,
   creator,
+  favourite,
+  rating,
   userRating,
+  cast,
+  platforms,
 }: ContentDetail) => {
   const { session } = useSession();
 
@@ -63,6 +64,14 @@ const TitleDetail = ({
     }) => removeFavouriteFn({ contentId, userId }),
   });
 
+  const combinedGenresArray = JSON.parse(combinedGenres) as string[];
+
+  const genresResult = z.array(z.string()).safeParse(combinedGenresArray);
+  if (!genresResult.success) {
+    throw genresResult.error;
+  }
+  const genresArray = genresResult.data;
+
   return (
     <div className="flex flex-col gap-y-5">
       <div className="flex gap-x-4">
@@ -84,40 +93,50 @@ const TitleDetail = ({
           <div className="absolute bottom-0 z-0 h-7 w-full rounded-b-xl bg-gradient-to-t from-black to-transparent opacity-0 transition-all duration-200 group-hover:opacity-100" />
         </Card>
 
-        <div className="flex w-3/5 flex-col justify-between py-3">
+        <div className="flex w-3/5 flex-col justify-between">
           <div>
             <p className="text-3xl font-bold uppercase">{title}</p>
 
-            <p className="text-lg">{description}</p>
+            <p className="text-lg">{combinedPlot}</p>
           </div>
 
           <div>
-            <KeyName name="Fecha de estreno" value={releaseDate} />
+            <KeyName name="Fecha de estreno" value={combinedReleaseDate} />
 
-            {seasons && (
-              <KeyName name="Temporadas" value={seasons.toString()} />
+            {combinedRuntime && (
+              <KeyName
+                name="Duración"
+                value={`${Math.round(
+                  (combinedRuntime ?? 0) / 60,
+                )} minutos${" por episodio"}`}
+              />
             )}
 
-            {duration && <KeyName name="Duración" value={`${duration}m`} />}
-
-            <KeyName name="Géneros" value={genres.join(", ")} />
+            <KeyName name="Géneros" value={genresArray.join(", ")} />
 
             {director && <KeyName name="Dirigida por" value={director} />}
 
             {creator && <KeyName name="Creada por" value={creator} />}
 
+            <KeyName
+              name="Presupuesto"
+              value={(combinedBudget ?? 45000).toString()}
+            />
+
             <div className="flex gap-x-3">
               <p className="text-xl font-semibold">Dónde ver: </p>
 
-              {platforms.map((streamingService, index) => (
-                <StreamingBadge
-                  key={index}
-                  streamingService={{
-                    logo: streamingService.logo,
-                    name: streamingService.name,
-                  }}
-                />
-              ))}
+              <div className="flex flex-wrap gap-2">
+                {platforms.map((streamingService, index) => (
+                  <StreamingBadge
+                    key={index}
+                    streamingService={{
+                      logo: streamingService.image,
+                      name: streamingService.name,
+                    }}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -139,9 +158,9 @@ const TitleDetail = ({
           )}
 
           <Rating
-            contentRating={contentRating}
+            contentRating={rating}
             contentId={id}
-            userRating={userRating}
+            userRating={userRating ?? undefined}
           />
         </div>
       </div>
@@ -150,8 +169,8 @@ const TitleDetail = ({
 
       <ScrollArea>
         <div className="flex gap-x-2">
-          {cast.map(({ name, imageUrl }) => (
-            <CastCard key={name} name={name} imageUrl={imageUrl} />
+          {cast.map(({ name, image }) => (
+            <CastCard key={name} name={name} imageUrl={image} />
           ))}
         </div>
 
