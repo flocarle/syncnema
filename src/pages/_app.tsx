@@ -10,7 +10,6 @@ import {
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import "~/styles/globals.css";
-import { env } from "~/env.mjs";
 
 export type NextPageWithLayout<PageProps = unknown> = NextPage<PageProps> & {
   getLayout?: (page: ReactElement<PageProps>) => ReactElement;
@@ -53,9 +52,8 @@ const MyApp = <T extends object>({
         }}
       >
         {getLayout(<Component {...pageProps} />)}
-        {env.NEXT_PUBLIC_SHOW_DEVTOOLS === "true" && (
-          <ReactQueryDevtools initialIsOpen={false} />
-        )}
+
+        <ReactQueryDevtools initialIsOpen={false} />
       </ClerkProvider>
     </QueryClientProvider>
   );
