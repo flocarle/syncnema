@@ -8,6 +8,7 @@ import ListingCard from "~/components/molecules/ListingCard";
 import type { InferGetServerSidePropsType } from "next";
 import { QueryClient, dehydrate } from "@tanstack/react-query";
 import { useListings } from "~/hooks/useListings";
+import { getListings } from "~/services/contentService";
 
 type TvShowsProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
@@ -47,6 +48,7 @@ const TvShows: NextPageWithLayout<TvShowsProps> = () => {
         hasMore={hasNextPage}
         loader={<p className="mt-4">Cargando...</p>}
         className="mt-8 flex flex-col items-center justify-center"
+        threshold={350}
       >
         <div className="flex w-full flex-row flex-wrap items-center justify-center gap-4">
           {tvShows?.map(({ record: tvShow }) => (
@@ -64,13 +66,18 @@ const TvShows: NextPageWithLayout<TvShowsProps> = () => {
 
 TvShows.getLayout = (page) => <Layout title="Series">{page}</Layout>;
 
-export const getServerSideProps = () => {
+export const getServerSideProps = async () => {
   const queryClient = new QueryClient();
 
-  // await queryClient.prefetchQuery({
-  //   queryKey: ["series"],
-  //   queryFn: () => getSeries({ page: 0 }),
-  // });
+  await queryClient.prefetchInfiniteQuery({
+    queryKey: ["series"],
+    queryFn: ({ pageParam }) =>
+      getListings({
+        type: "Serie",
+        page: pageParam,
+      }),
+    initialPageParam: 0,
+  });
 
   return {
     props: {

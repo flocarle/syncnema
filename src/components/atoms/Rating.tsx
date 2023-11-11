@@ -78,7 +78,6 @@ const RatingModal = ({
 };
 
 const Rating = ({ userRating, contentRating, contentId }: RatingProps) => {
-  const ratingInScale = Math.floor((contentRating * 10) / 100);
   const { session } = useSession();
 
   const { mutate: rate } = useMutation({
@@ -112,7 +111,7 @@ const Rating = ({ userRating, contentRating, contentId }: RatingProps) => {
 
         <div className="flex items-center">
           <p className="text-base">
-            <span className="text-lg font-bold">{ratingInScale}</span>/10
+            <span className="text-lg font-bold">{contentRating}</span>/10
           </p>
 
           <AiFillStar size={32} className="text-yellow-400" />

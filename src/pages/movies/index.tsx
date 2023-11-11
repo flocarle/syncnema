@@ -8,6 +8,7 @@ import InfiniteScroll from "react-infinite-scroller";
 import { QueryClient, dehydrate } from "@tanstack/react-query";
 import type { InferGetServerSidePropsType } from "next";
 import { useListings } from "~/hooks/useListings";
+import { getListings } from "~/services/contentService";
 
 type MovieProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
@@ -46,6 +47,7 @@ const Movies: NextPageWithLayout<MovieProps> = () => {
         hasMore={hasNextPage}
         loader={<p className="mt-4">Cargando...</p>}
         className="mt-8 flex flex-col items-center justify-center"
+        threshold={350}
       >
         <div className="flex w-full flex-row flex-wrap items-center justify-center gap-4">
           {movies.map(({ record: movie }) => (
@@ -63,13 +65,18 @@ const Movies: NextPageWithLayout<MovieProps> = () => {
 
 Movies.getLayout = (page) => <Layout title="Películas">{page}</Layout>;
 
-export const getServerSideProps = () => {
+export const getServerSideProps = async () => {
   const queryClient = new QueryClient();
 
-  // await queryClient.prefetchInfiniteQuery({
-  //   queryKey: ["movies"],
-  //   queryFn: () => getMovies({ page: 0 }),
-  // });
+  await queryClient.prefetchInfiniteQuery({
+    queryKey: ["movies"],
+    queryFn: ({ pageParam }) =>
+      getListings({
+        type: "Movie",
+        page: pageParam,
+      }),
+    initialPageParam: 0,
+  });
 
   return {
     props: {
