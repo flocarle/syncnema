@@ -9,11 +9,19 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
+import { useSession } from "@clerk/nextjs";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  add as addRating,
+  update as updateRating,
+} from "~/services/ratingService";
+import type { ContentType } from "~/models/Content";
 
 type RatingProps = {
-  peopleRating: number;
-  userRating: number;
-  setUserRating: (rating: number) => void;
+  contentRating: number;
+  contentId: string;
+  userRating?: number;
+  type: ContentType;
 };
 
 const RatingModal = ({
@@ -71,8 +79,48 @@ const RatingModal = ({
   );
 };
 
-const Rating = ({ peopleRating, userRating, setUserRating }: RatingProps) => {
-  const ratingInScale = Math.floor((peopleRating * 10) / 100);
+const Rating = ({
+  userRating,
+  contentRating,
+  contentId,
+  type,
+}: RatingProps) => {
+  const { session } = useSession();
+  const queryClient = useQueryClient();
+
+  const { mutate: rate } = useMutation({
+    mutationFn: ({
+      contentId,
+      userId,
+      score,
+    }: {
+      contentId: string;
+      userId: string;
+      score: number;
+    }) => addRating({ contentId, userId, score }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: [type.toLocaleLowerCase(), contentId.toString()],
+      });
+    },
+  });
+
+  const { mutate: updateRate } = useMutation({
+    mutationFn: ({
+      contentId,
+      userId,
+      score,
+    }: {
+      contentId: string;
+      userId: string;
+      score: number;
+    }) => updateRating({ contentId, userId, score }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: [type.toLocaleLowerCase(), contentId.toString()],
+      });
+    },
+  });
 
   return (
     <div className="flex flex-col gap-y-3">
@@ -81,36 +129,46 @@ const Rating = ({ peopleRating, userRating, setUserRating }: RatingProps) => {
 
         <div className="flex items-center">
           <p className="text-base">
-            <span className="text-lg font-bold">{ratingInScale}</span>/10
+            <span className="text-lg font-bold">{contentRating}</span>/10
           </p>
 
           <AiFillStar size={32} className="text-yellow-400" />
         </div>
       </div>
 
-      <div className="flex flex-col gap-1">
-        <p className="text-lg font-semibold">Tu puntuación</p>
+      {session && (
+        <div className="flex flex-col gap-1">
+          <p className="text-lg font-semibold">Tu puntuación</p>
 
-        {userRating > 0 ? (
-          <div className="flex">
-            <p className="text-base">
-              <span className="text-lg font-bold">{userRating}</span>/10
-            </p>
+          {userRating ? (
+            <div className="flex">
+              <p className="text-base">
+                <span className="text-lg font-bold">{userRating}</span>/10
+              </p>
 
+              <RatingModal
+                userRating={userRating}
+                setUserRating={(score) =>
+                  updateRate({
+                    contentId,
+                    userId: session.user.id,
+                    score,
+                  })
+                }
+                trigger={<AiFillEdit size={24} />}
+              />
+            </div>
+          ) : (
             <RatingModal
-              userRating={userRating}
-              setUserRating={setUserRating}
-              trigger={<AiFillEdit size={24} />}
+              userRating={0}
+              setUserRating={(score) =>
+                rate({ contentId, userId: session.user.id, score })
+              }
+              trigger={<AiOutlinePlusCircle size={24} />}
             />
-          </div>
-        ) : (
-          <RatingModal
-            userRating={userRating}
-            setUserRating={setUserRating}
-            trigger={<AiOutlinePlusCircle size={24} />}
-          />
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

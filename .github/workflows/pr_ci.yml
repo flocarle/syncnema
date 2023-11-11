@@ -17,6 +17,7 @@ jobs:
       NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: ${{ vars.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL }}
       NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: ${{ vars.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL }}
       CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+      WEBHOOK_SECRET: ${{ secrets.WEBHOOK_SECRET }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3

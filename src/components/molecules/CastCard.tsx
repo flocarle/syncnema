@@ -8,13 +8,15 @@ type ImageCardProps = {
 const CastCard = ({ imageUrl, name }: ImageCardProps) => (
   <Card
     style={{
-      backgroundImage: `url(${imageUrl})`,
+      backgroundImage: `${
+        imageUrl === "" ? "url(/images/noCastImage.webp)" : `url(${imageUrl})`
+      }`,
     }}
-    className={"group relative h-48 w-40 bg-cover"}
+    className={"group relative h-48 w-40 bg-cover bg-center"}
   >
     <div className="group-hover:border-fade h-full w-full rounded-xl bg-black bg-opacity-0 transition-all duration-200 group-hover:bg-opacity-10" />
 
-    <p className="absolute bottom-2 z-10 flex w-full justify-center text-lg font-bold tracking-wide text-gray-200 opacity-0 transition-all duration-200 group-hover:opacity-100">
+    <p className="absolute bottom-2 z-10 flex w-full justify-center text-center text-lg font-bold tracking-wide text-gray-200 opacity-0 transition-all duration-200 group-hover:opacity-100">
       {name}
     </p>
 

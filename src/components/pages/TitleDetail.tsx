@@ -2,27 +2,19 @@ import Link from "next/link";
 import { Card } from "../ui/card";
 import CastCard from "../molecules/CastCard";
 import StreamingBadge from "../atoms/StreamingBadge";
-import { type StreamingService } from "~/utils/constants/StreamingServices";
 import Rating from "../atoms/Rating";
-import { useState } from "react";
 import { AiFillHeart } from "react-icons/ai";
 import { cn } from "~/utils";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
+import type { ContentDetail, ContentType } from "~/models/Content";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  add as addFavouriteFn,
+  remove as removeFavouriteFn,
+} from "~/services/favouritesService";
 
-type TitleDetailProps = {
-  name: string;
-  description: string;
-  imageUrl: string;
-  trailerUrl?: string;
-  whereToWatch: StreamingService[];
-  duration?: string;
-  director: string;
-  genres: string[];
-  rating: number;
-  cast: { name: string; id: string; imageUrl: string }[];
-  tvShow?: boolean;
-  seasons?: number;
-};
+import { useSession } from "@clerk/nextjs";
+import { z } from "zod";
 
 const KeyName = ({ name, value }: { name: string; value: string }) => (
   <div className="flex items-center gap-x-2">
@@ -33,21 +25,66 @@ const KeyName = ({ name, value }: { name: string; value: string }) => (
 );
 
 const TitleDetail = ({
-  name,
-  description,
+  id,
+  title,
+  combinedPlot,
   imageUrl,
   trailerUrl,
-  whereToWatch,
-  duration,
+  combinedReleaseDate,
+  combinedGenres,
+  combinedRuntime,
+  combinedBudget,
   director,
-  genres,
+  creator,
+  favourite,
   rating,
+  userRating,
   cast,
-  tvShow,
-  seasons,
-}: TitleDetailProps) => {
-  const [userRating, setUserRating] = useState(0);
-  const [favorite, setIsFavorite] = useState(false);
+  platforms,
+  type,
+}: ContentDetail & { type: ContentType }) => {
+  const { session } = useSession();
+  const queryClient = useQueryClient();
+
+  const { mutate: addFavourite } = useMutation({
+    mutationFn: ({
+      contentId,
+      userId,
+    }: {
+      contentId: string;
+      userId: string;
+    }) => addFavouriteFn({ contentId, userId }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: [type.toLocaleLowerCase(), id.toString()],
+      });
+    },
+  });
+
+  const { mutate: removeFavourite } = useMutation({
+    mutationFn: ({
+      contentId,
+      userId,
+    }: {
+      contentId: string;
+      userId: string;
+    }) => removeFavouriteFn({ contentId, userId }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: [type.toLocaleLowerCase(), id.toString()],
+      });
+    },
+  });
+
+  const combinedGenresArray = JSON.parse(combinedGenres) as string[];
+
+  const genresResult = z.array(z.string()).safeParse(combinedGenresArray);
+  if (!genresResult.success) {
+    throw genresResult.error;
+  }
+  const genresArray = genresResult.data;
+
+  const duration = Math.round((combinedRuntime ?? 0) / 60);
 
   return (
     <div className="flex flex-col gap-y-5">
@@ -70,50 +107,80 @@ const TitleDetail = ({
           <div className="absolute bottom-0 z-0 h-7 w-full rounded-b-xl bg-gradient-to-t from-black to-transparent opacity-0 transition-all duration-200 group-hover:opacity-100" />
         </Card>
 
-        <div className="flex w-3/5 flex-col justify-between py-3">
+        <div className="flex w-3/5 flex-col justify-between">
           <div>
-            <p className="text-3xl font-bold uppercase">{name}</p>
+            <p className="text-3xl font-bold uppercase">{title}</p>
 
-            <p className="text-lg">{description}</p>
+            <p className="text-lg">{combinedPlot}</p>
           </div>
 
           <div>
-            {tvShow
-              ? seasons && (
-                  <KeyName name="Temporadas" value={seasons.toString()} />
-                )
-              : duration && <KeyName name="Duración" value={duration} />}
+            <KeyName name="Fecha de estreno" value={combinedReleaseDate} />
 
-            <KeyName name="Géneros" value={genres.join(", ")} />
+            {duration && (
+              <KeyName
+                name="Duración"
+                value={`${duration} minutos ${
+                  duration < 60 && type === "Serie" ? "por capítulo" : ""
+                }`}
+              />
+            )}
 
-            <KeyName name="Dirigida por" value={director} />
+            <KeyName name="Géneros" value={genresArray.join(", ")} />
+
+            {director && <KeyName name="Dirigida por" value={director} />}
+
+            {creator && <KeyName name="Creada por" value={creator} />}
+
+            {combinedBudget && (
+              <KeyName name="Presupuesto" value={combinedBudget.toString()} />
+            )}
+
             <div className="flex gap-x-3">
               <p className="text-xl font-semibold">Dónde ver: </p>
 
-              {whereToWatch.map((streamingService, index) => (
-                <StreamingBadge
-                  key={index}
-                  streamingService={streamingService}
-                />
-              ))}
+              <div className="flex flex-wrap gap-2">
+                {platforms.map((streamingService, index) => (
+                  <StreamingBadge
+                    key={index}
+                    streamingService={{
+                      logo: streamingService.image,
+                      name: streamingService.name,
+                    }}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
         <div className="flex w-2/5 flex-1 flex-col gap-y-4">
-          <AiFillHeart
-            className={cn(
-              "cursor-pointer self-end",
-              favorite ? "scale-110 text-red-600" : "text-gray-400 ",
-            )}
-            onClick={() => setIsFavorite(!favorite)}
-            fontSize="50px"
-          />
+          {session && (
+            <AiFillHeart
+              className={cn(
+                "cursor-pointer self-end",
+                favourite ? "scale-110 text-red-600" : "text-gray-400 ",
+              )}
+              onClick={() =>
+                favourite
+                  ? removeFavourite({
+                      contentId: id.toString(),
+                      userId: session.user.id,
+                    })
+                  : addFavourite({
+                      contentId: id.toString(),
+                      userId: session.user.id,
+                    })
+              }
+              fontSize="50px"
+            />
+          )}
 
           <Rating
-            peopleRating={rating}
-            userRating={userRating}
-            setUserRating={setUserRating}
+            contentRating={rating}
+            contentId={id.toString()}
+            userRating={userRating ?? undefined}
+            type={type}
           />
         </div>
       </div>
@@ -122,8 +189,8 @@ const TitleDetail = ({
 
       <ScrollArea>
         <div className="flex gap-x-2">
-          {cast.map(({ name, id, imageUrl }) => (
-            <CastCard key={id} name={name} imageUrl={imageUrl} />
+          {cast.map(({ name, image }) => (
+            <CastCard key={name} name={name} imageUrl={image} />
           ))}
         </div>
 
