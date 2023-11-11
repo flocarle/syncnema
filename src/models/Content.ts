@@ -32,7 +32,7 @@ export type Content = {
 };
 
 export type ContentDetail = {
-  id: string;
+  id: number;
   title: string;
   imageUrl: string; //TODO
   trailerUrl: string;

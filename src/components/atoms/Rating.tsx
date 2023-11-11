@@ -133,7 +133,7 @@ const Rating = ({ userRating, contentRating, contentId }: RatingProps) => {
                 setUserRating={(score) =>
                   updateRate({
                     contentId,
-                    userId: session.id,
+                    userId: session.user.id,
                     score,
                   })
                 }
@@ -144,7 +144,7 @@ const Rating = ({ userRating, contentRating, contentId }: RatingProps) => {
             <RatingModal
               userRating={0}
               setUserRating={(score) =>
-                rate({ contentId, userId: session.id, score })
+                rate({ contentId, userId: session.user.id, score })
               }
               trigger={<AiOutlinePlusCircle size={24} />}
             />

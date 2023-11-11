@@ -23,8 +23,12 @@ export const getListings = async (props: ContentProps) => {
   return data;
 };
 
-export const byId = async ({ id }: { id: string; userId?: string }) => {
-  const { data } = await axiosClient.get<ContentDetail>(`/contents/${id}`);
+export const byId = async ({ id, userId }: { id: string; userId?: string }) => {
+  const { data } = await axiosClient.get<ContentDetail>(`/contents/${id}`, {
+    params: {
+      userId: userId ?? undefined,
+    },
+  });
 
   return data;
 };

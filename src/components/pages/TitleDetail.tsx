@@ -7,7 +7,7 @@ import { AiFillHeart } from "react-icons/ai";
 import { cn } from "~/utils";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import type { ContentDetail, ContentType } from "~/models/Content";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   add as addFavouriteFn,
   remove as removeFavouriteFn,
@@ -44,6 +44,7 @@ const TitleDetail = ({
   type,
 }: ContentDetail & { type: ContentType }) => {
   const { session } = useSession();
+  const queryClient = useQueryClient();
 
   const { mutate: addFavourite } = useMutation({
     mutationFn: ({
@@ -53,6 +54,11 @@ const TitleDetail = ({
       contentId: string;
       userId: string;
     }) => addFavouriteFn({ contentId, userId }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: [type.toLocaleLowerCase(), id.toString()],
+      });
+    },
   });
 
   const { mutate: removeFavourite } = useMutation({
@@ -63,6 +69,11 @@ const TitleDetail = ({
       contentId: string;
       userId: string;
     }) => removeFavouriteFn({ contentId, userId }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: [type.toLocaleLowerCase(), id.toString()],
+      });
+    },
   });
 
   const combinedGenresArray = JSON.parse(combinedGenres) as string[];
@@ -152,8 +163,14 @@ const TitleDetail = ({
               )}
               onClick={() =>
                 favourite
-                  ? removeFavourite({ contentId: id, userId: session.id })
-                  : addFavourite({ contentId: id, userId: session.id })
+                  ? removeFavourite({
+                      contentId: id.toString(),
+                      userId: session.user.id,
+                    })
+                  : addFavourite({
+                      contentId: id.toString(),
+                      userId: session.user.id,
+                    })
               }
               fontSize="50px"
             />
@@ -161,7 +178,7 @@ const TitleDetail = ({
 
           <Rating
             contentRating={rating}
-            contentId={id}
+            contentId={id.toString()}
             userRating={userRating ?? undefined}
           />
         </div>
