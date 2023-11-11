@@ -2,7 +2,7 @@ lockfileVersion: '6.0'
 
 dependencies:
   '@clerk/nextjs':
-    specifier: ^4.27.1
+    specifier: ^4.25.7
     version: 4.27.1(next@13.4.19)(react-dom@18.2.0)(react@18.2.0)
   '@headlessui/react':
     specifier: ^1.7.17

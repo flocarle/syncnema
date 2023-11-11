@@ -10,7 +10,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
-    "@clerk/nextjs": "^4.27.1",
+    "@clerk/nextjs": "^4.25.7",
     "@headlessui/react": "^1.7.17",
     "@headlessui/tailwindcss": "^0.2.0",
     "@radix-ui/react-dialog": "^1.0.5",

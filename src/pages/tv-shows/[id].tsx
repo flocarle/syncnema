@@ -13,7 +13,7 @@ type TvShowProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
 const TvShow: NextPageWithLayout<TvShowProps> = ({ tvShowId, userId }) => {
   const { data: tvShow, isLoading } = useQuery({
-    queryKey: ["movie", tvShowId],
+    queryKey: ["serie", tvShowId],
     queryFn: () => byId({ id: tvShowId, userId: userId ?? undefined }),
   });
 

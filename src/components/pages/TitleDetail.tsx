@@ -180,6 +180,7 @@ const TitleDetail = ({
             contentRating={rating}
             contentId={id.toString()}
             userRating={userRating ?? undefined}
+            type={type}
           />
         </div>
       </div>

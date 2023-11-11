@@ -24,7 +24,7 @@ export const remove = async ({
   userId: string;
 }) => {
   await axiosClient.delete<{ message: string }>(
-    `/favourites?content_id=${contentId}&user_id${userId}`,
+    `/favourites?content_id=${contentId}&user_id=${userId}`,
   );
 };
 

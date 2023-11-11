@@ -1,6 +1,10 @@
-import type { Content } from "./Content";
+export type FavouriteListing = {
+  id: number;
+  title: string;
+  imageUrl: string;
+};
 
 export type Favourite = {
-  movies: Content[];
-  series: Content[];
+  movies: FavouriteListing[];
+  series: FavouriteListing[];
 };

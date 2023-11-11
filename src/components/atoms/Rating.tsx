@@ -10,16 +10,18 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 import { useSession } from "@clerk/nextjs";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   add as addRating,
   update as updateRating,
 } from "~/services/ratingService";
+import type { ContentType } from "~/models/Content";
 
 type RatingProps = {
   contentRating: number;
   contentId: string;
   userRating?: number;
+  type: ContentType;
 };
 
 const RatingModal = ({
@@ -77,8 +79,14 @@ const RatingModal = ({
   );
 };
 
-const Rating = ({ userRating, contentRating, contentId }: RatingProps) => {
+const Rating = ({
+  userRating,
+  contentRating,
+  contentId,
+  type,
+}: RatingProps) => {
   const { session } = useSession();
+  const queryClient = useQueryClient();
 
   const { mutate: rate } = useMutation({
     mutationFn: ({
@@ -90,6 +98,11 @@ const Rating = ({ userRating, contentRating, contentId }: RatingProps) => {
       userId: string;
       score: number;
     }) => addRating({ contentId, userId, score }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: [type.toLocaleLowerCase(), contentId.toString()],
+      });
+    },
   });
 
   const { mutate: updateRate } = useMutation({
@@ -102,6 +115,11 @@ const Rating = ({ userRating, contentRating, contentId }: RatingProps) => {
       userId: string;
       score: number;
     }) => updateRating({ contentId, userId, score }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: [type.toLocaleLowerCase(), contentId.toString()],
+      });
+    },
   });
 
   return (
