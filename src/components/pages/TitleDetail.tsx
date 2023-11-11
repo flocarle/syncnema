@@ -72,6 +72,8 @@ const TitleDetail = ({
   }
   const genresArray = genresResult.data;
 
+  const duration = Math.round((combinedRuntime ?? 0) / 60);
+
   return (
     <div className="flex flex-col gap-y-5">
       <div className="flex gap-x-4">
@@ -103,12 +105,12 @@ const TitleDetail = ({
           <div>
             <KeyName name="Fecha de estreno" value={combinedReleaseDate} />
 
-            {combinedRuntime && (
+            {duration && (
               <KeyName
                 name="Duración"
-                value={`${Math.round(
-                  (combinedRuntime ?? 0) / 60,
-                )} minutos${" por episodio"}`}
+                value={`${duration} minutos ${
+                  duration < 60 ? "por capítulo" : ""
+                }`}
               />
             )}
 
@@ -118,10 +120,9 @@ const TitleDetail = ({
 
             {creator && <KeyName name="Creada por" value={creator} />}
 
-            <KeyName
-              name="Presupuesto"
-              value={(combinedBudget ?? 45000).toString()}
-            />
+            {combinedBudget && (
+              <KeyName name="Presupuesto" value={combinedBudget.toString()} />
+            )}
 
             <div className="flex gap-x-3">
               <p className="text-xl font-semibold">Dónde ver: </p>
