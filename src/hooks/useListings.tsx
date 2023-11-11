@@ -12,8 +12,10 @@ export const useListings = (
   type: ContentType,
   { genres, platforms, query }: UseListingsParams,
 ) => {
+  const queryTypeKey = (type.toLocaleLowerCase() + "s") as "movies" | "series";
+
   const result = useInfiniteQuery<ContentList>({
-    queryKey: [type, query, genres, platforms],
+    queryKey: [queryTypeKey, query, genres, platforms],
     queryFn: ({ pageParam }) =>
       getListings({
         type,

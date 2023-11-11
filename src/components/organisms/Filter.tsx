@@ -23,12 +23,12 @@ const Filter = ({
 }: FilterProps) => {
   const { data: genres } = useQuery({
     queryKey: ["genres"],
-    queryFn: () => allGenres(),
+    queryFn: allGenres,
   });
 
   const { data: platforms } = useQuery({
     queryKey: ["platforms"],
-    queryFn: () => allPlatforms(),
+    queryFn: allPlatforms,
   });
 
   return (

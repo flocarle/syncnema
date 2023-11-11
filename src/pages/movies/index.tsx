@@ -9,6 +9,7 @@ import { QueryClient, dehydrate } from "@tanstack/react-query";
 import type { InferGetServerSidePropsType } from "next";
 import { useListings } from "~/hooks/useListings";
 import { getListings } from "~/services/contentService";
+import { allGenres, allPlatforms } from "~/services/filterDataService";
 
 type MovieProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
@@ -69,13 +70,23 @@ export const getServerSideProps = async () => {
   const queryClient = new QueryClient();
 
   await queryClient.prefetchInfiniteQuery({
-    queryKey: ["movies"],
+    queryKey: ["movies", "", [], []],
     queryFn: ({ pageParam }) =>
       getListings({
         type: "Movie",
         page: pageParam,
       }),
     initialPageParam: 0,
+  });
+
+  await queryClient.prefetchQuery({
+    queryKey: ["genres"],
+    queryFn: () => allGenres(),
+  });
+
+  await queryClient.prefetchQuery({
+    queryKey: ["platforms"],
+    queryFn: () => allPlatforms(),
   });
 
   return {

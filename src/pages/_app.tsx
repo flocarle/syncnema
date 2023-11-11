@@ -7,8 +7,10 @@ import {
   QueryClientProvider,
   type DehydratedState,
 } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import "~/styles/globals.css";
+import { env } from "~/env.mjs";
 
 export type NextPageWithLayout<PageProps = unknown> = NextPage<PageProps> & {
   getLayout?: (page: ReactElement<PageProps>) => ReactElement;
@@ -28,31 +30,34 @@ const MyApp = <T extends object>({
   const [queryClient] = useState(() => new QueryClient());
 
   return (
-    <ClerkProvider
-      appearance={{
-        variables: {
-          colorPrimary: "#0B001B",
-          colorTextOnPrimaryBackground: "#E8E8E9",
-          colorText: "#0B001B",
-          colorBackground: "#F6F8F9",
-          colorDanger: "#D64D3D",
-          colorInputBackground: "#E3E3E5",
-          colorTextSecondary: "#1C001D",
-        },
-        elements: {
-          logoBox: {
-            height: "100%",
+    <QueryClientProvider client={queryClient}>
+      <ClerkProvider
+        appearance={{
+          variables: {
+            colorPrimary: "#0B001B",
+            colorTextOnPrimaryBackground: "#E8E8E9",
+            colorText: "#0B001B",
+            colorBackground: "#F6F8F9",
+            colorDanger: "#D64D3D",
+            colorInputBackground: "#E3E3E5",
+            colorTextSecondary: "#1C001D",
           },
-          card: {
-            rowGap: "16px",
+          elements: {
+            logoBox: {
+              height: "100%",
+            },
+            card: {
+              rowGap: "16px",
+            },
           },
-        },
-      }}
-    >
-      <QueryClientProvider client={queryClient}>
+        }}
+      >
         {getLayout(<Component {...pageProps} />)}
-      </QueryClientProvider>
-    </ClerkProvider>
+        {env.NEXT_PUBLIC_SHOW_DEVTOOLS === "true" && (
+          <ReactQueryDevtools initialIsOpen={false} />
+        )}
+      </ClerkProvider>
+    </QueryClientProvider>
   );
 };
 

@@ -9,6 +9,7 @@ import type { InferGetServerSidePropsType } from "next";
 import { QueryClient, dehydrate } from "@tanstack/react-query";
 import { useListings } from "~/hooks/useListings";
 import { getListings } from "~/services/contentService";
+import { allGenres, allPlatforms } from "~/services/filterDataService";
 
 type TvShowsProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 
@@ -70,7 +71,7 @@ export const getServerSideProps = async () => {
   const queryClient = new QueryClient();
 
   await queryClient.prefetchInfiniteQuery({
-    queryKey: ["series"],
+    queryKey: ["series", "", [], []],
     queryFn: ({ pageParam }) =>
       getListings({
         type: "Serie",
@@ -79,10 +80,21 @@ export const getServerSideProps = async () => {
     initialPageParam: 0,
   });
 
+  await queryClient.prefetchQuery({
+    queryKey: ["genres"],
+    queryFn: () => allGenres(),
+  });
+
+  await queryClient.prefetchQuery({
+    queryKey: ["platforms"],
+    queryFn: () => allPlatforms(),
+  });
+
   return {
     props: {
       dehydratedState: dehydrate(queryClient),
     },
   };
 };
+
 export default TvShows;
