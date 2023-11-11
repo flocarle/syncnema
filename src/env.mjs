@@ -23,7 +23,7 @@ export const env = createEnv({
     NEXT_PUBLIC_CLERK_SIGN_UP_URL: z.string().min(1),
     NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: z.string().min(1),
     NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: z.string().min(1),
-    NEXT_PUBLIC_SHOW_DEVTOOLS: z.enum(["true", "false"]),
+    NEXT_PUBLIC_SHOW_DEVTOOLS: z.enum(["true", "false"]).optional(),
   },
 
   /**
