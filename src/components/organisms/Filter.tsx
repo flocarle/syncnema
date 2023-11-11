@@ -1,6 +1,8 @@
 import type { Dispatch, SetStateAction } from "react";
 import SearchBar from "../molecules/SearchBar";
 import Dropdown from "../atoms/Dropdown";
+import { useQuery } from "@tanstack/react-query";
+import { allGenres, allPlatforms } from "~/services/filterDataService";
 
 type FilterProps = {
   selectedGenres: string[];
@@ -19,25 +21,15 @@ const Filter = ({
   setSelectedPlatforms,
   setSearch,
 }: FilterProps) => {
-  const genres = [
-    "Comedia",
-    "Drama",
-    "Terror",
-    "Acción",
-    "Ciencia Ficción",
-    "Animación",
-    "Aventura",
-    "Fantasía",
-  ];
+  const { data: genres } = useQuery({
+    queryKey: ["genres"],
+    queryFn: () => allGenres(),
+  });
 
-  const platforms = [
-    "Netflix",
-    "Prime Video",
-    "Disney+",
-    "HBO Max",
-    "Paramount",
-    "Star+",
-  ];
+  const { data: platforms } = useQuery({
+    queryKey: ["platforms"],
+    queryFn: () => allPlatforms(),
+  });
 
   return (
     <div className="flex items-center justify-start gap-x-3">
@@ -53,7 +45,7 @@ const Filter = ({
       <div className="h-9 w-1/5">
         <Dropdown
           placeholder="Género"
-          options={genres}
+          options={genres ?? []}
           multiple
           onChange={(value) => setSelectedGenres(value as string[])}
           value={selectedGenres}
@@ -63,7 +55,7 @@ const Filter = ({
       <div className="h-9 w-1/5">
         <Dropdown
           placeholder="Plataforma"
-          options={platforms}
+          options={platforms ?? []}
           multiple
           onChange={(value) => setSelectedPlatforms(value as string[])}
           value={selectedPlatforms}

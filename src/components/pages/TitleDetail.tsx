@@ -6,7 +6,7 @@ import Rating from "../atoms/Rating";
 import { AiFillHeart } from "react-icons/ai";
 import { cn } from "~/utils";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
-import type { ContentDetail } from "~/models/Content";
+import type { ContentDetail, ContentType } from "~/models/Content";
 import { useMutation } from "@tanstack/react-query";
 import {
   add as addFavouriteFn,
@@ -41,7 +41,8 @@ const TitleDetail = ({
   userRating,
   cast,
   platforms,
-}: ContentDetail) => {
+  type,
+}: ContentDetail & { type: ContentType }) => {
   const { session } = useSession();
 
   const { mutate: addFavourite } = useMutation({
@@ -109,7 +110,7 @@ const TitleDetail = ({
               <KeyName
                 name="Duración"
                 value={`${duration} minutos ${
-                  duration < 60 ? "por capítulo" : ""
+                  duration < 60 && type === "Serie" ? "por capítulo" : ""
                 }`}
               />
             )}

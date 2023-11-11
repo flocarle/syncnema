@@ -19,7 +19,7 @@ const Movie: NextPageWithLayout<MovieProps> = ({ movieId, userId }) => {
 
   if (isLoading || !movie) return <p>Loading...</p>;
 
-  return <TitleDetail {...movie} id={movieId} />;
+  return <TitleDetail {...movie} type="Movie" />;
 };
 
 Movie.getLayout = (page) => <Layout>{page}</Layout>;

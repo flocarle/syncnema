@@ -19,7 +19,7 @@ const TvShow: NextPageWithLayout<TvShowProps> = ({ tvShowId, userId }) => {
 
   if (isLoading || !tvShow) return <p>Loading...</p>;
 
-  return <TitleDetail {...tvShow} />;
+  return <TitleDetail {...tvShow} type="Serie" />;
 };
 
 TvShow.getLayout = (page) => <Layout>{page}</Layout>;
