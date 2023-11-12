@@ -12,10 +12,12 @@ type ContentProps = {
 export const PAGE_SIZE = 20;
 
 export const getListings = async (props: ContentProps) => {
-  const { data } = await axiosClient.get<ContentList>(`/contents`, {
+  const { data } = await axiosClient.get<ContentList>("/contents", {
     params: {
+      type: props.type,
       size: PAGE_SIZE,
-      ...props,
+      platforms: JSON.stringify(props.platforms),
+      genres: JSON.stringify(props.genres),
       query: props.query !== "" ? props.query : undefined,
     },
   });
