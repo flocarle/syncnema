@@ -16,6 +16,7 @@ export const getListings = async (props: ContentProps) => {
     params: {
       type: props.type,
       size: PAGE_SIZE,
+      page: props.page,
       platforms: JSON.stringify(props.platforms),
       genres: JSON.stringify(props.genres),
       query: props.query !== "" ? props.query : undefined,
