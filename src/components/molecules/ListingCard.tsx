@@ -23,7 +23,7 @@ const ListingCard = ({ id, imageUrl, title, type }: ListingCardProps) => {
         <div className="h-full w-full rounded-xl bg-black bg-opacity-0 transition-all duration-200 group-hover:bg-opacity-60" />
 
         <p className="absolute left-0 top-0 flex h-full w-full items-center justify-center text-center text-xl font-bold tracking-wide text-white opacity-0 transition-all duration-200 group-hover:opacity-100">
-          {title}
+          {title.replaceAll("&apos;", "'")}
         </p>
       </Link>
     </Card>

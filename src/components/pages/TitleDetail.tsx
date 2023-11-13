@@ -109,7 +109,9 @@ const TitleDetail = ({
 
         <div className="flex w-3/5 flex-col justify-between">
           <div>
-            <p className="text-3xl font-bold uppercase">{title}</p>
+            <p className="text-3xl font-bold uppercase">
+              {title.replaceAll("&apos;", "'")}
+            </p>
 
             <p className="text-lg">{combinedPlot}</p>
           </div>
@@ -132,25 +134,27 @@ const TitleDetail = ({
 
             {creator && <KeyName name="Creada por" value={creator} />}
 
-            {combinedBudget && (
+            {combinedBudget && combinedBudget !== 0 && (
               <KeyName name="Presupuesto" value={combinedBudget.toString()} />
             )}
 
-            <div className="flex gap-x-3">
-              <p className="text-xl font-semibold">Dónde ver: </p>
+            {platforms.length > 0 && (
+              <div className="flex gap-x-3">
+                <p className="text-xl font-semibold">Dónde ver: </p>
 
-              <div className="flex flex-wrap gap-2">
-                {platforms.map((streamingService, index) => (
-                  <StreamingBadge
-                    key={index}
-                    streamingService={{
-                      logo: streamingService.image,
-                      name: streamingService.name,
-                    }}
-                  />
-                ))}
+                <div className="flex flex-wrap gap-2">
+                  {platforms.map((streamingService, index) => (
+                    <StreamingBadge
+                      key={index}
+                      streamingService={{
+                        logo: streamingService.image,
+                        name: streamingService.name,
+                      }}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
 
