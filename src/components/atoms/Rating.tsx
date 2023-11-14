@@ -28,10 +28,12 @@ const RatingModal = ({
   userRating,
   setUserRating,
   trigger,
+  type,
 }: {
   userRating: number;
   setUserRating: (rating: number) => void;
   trigger: React.ReactNode;
+  type: ContentType;
 }) => {
   const [rating, setRating] = useState(userRating);
   const [userIsRating, setUserIsRating] = useState(false);
@@ -41,7 +43,9 @@ const RatingModal = ({
       <DialogTrigger>{trigger}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Puntúa esta película</DialogTitle>
+          <DialogTitle>
+            Puntúa esta {type === "Movie" ? "Película" : "Serie"}
+          </DialogTitle>
           <DialogDescription>
             <div className="flex">
               {Array.from({ length: 10 }, (_, i) => i).map((_, i) => {
@@ -156,6 +160,7 @@ const Rating = ({
                   })
                 }
                 trigger={<AiFillEdit size={24} />}
+                type={type}
               />
             </div>
           ) : (
@@ -165,6 +170,7 @@ const Rating = ({
                 rate({ contentId, userId: session.user.id, score })
               }
               trigger={<AiOutlinePlusCircle size={24} />}
+              type={type}
             />
           )}
         </div>
