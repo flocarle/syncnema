@@ -134,9 +134,11 @@ const TitleDetail = ({
 
             {creator && <KeyName name="Creada por" value={creator} />}
 
-            {combinedBudget && combinedBudget !== 0 && (
-              <KeyName name="Presupuesto" value={combinedBudget.toString()} />
-            )}
+            {combinedBudget !== null &&
+              combinedBudget !== undefined &&
+              combinedBudget !== 0 && (
+                <KeyName name="Presupuesto" value={combinedBudget.toString()} />
+              )}
 
             {platforms.length > 0 && (
               <div className="flex gap-x-3">
